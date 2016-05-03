@@ -77,7 +77,6 @@
     <ClCompile Include="Skeleton.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\VectorMath.h" />
     <ClInclude Include="ErrorHandler.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="Material.h" />
@@ -85,6 +84,7 @@
     <ClInclude Include="RenderState_Light.h" />
     <ClInclude Include="Shaders.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="vectormath.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

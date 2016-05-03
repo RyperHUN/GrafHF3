@@ -12,6 +12,13 @@ class Object {
 	vec3 scale, pos, rotAxis;
 	float rotAngle;
 public:
+	Object()
+	{
+		scale = vec3(1, 1, 1);
+		pos = vec3(0, 0, 0);
+		rotAxis = vec3(0, 0, 0);
+		rotAngle = 0;
+	}
 	void Draw(RenderState state) {  //RenderState mi az a renderstate?
 		state.M = Scale(scale.x, scale.y, scale.z) *
 			Rotate(rotAngle, rotAxis.x, rotAxis.y, rotAxis.z) *

@@ -20,9 +20,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\VectorMath.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="ErrorHandler.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -42,6 +39,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="RenderState_Light.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vectormath.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

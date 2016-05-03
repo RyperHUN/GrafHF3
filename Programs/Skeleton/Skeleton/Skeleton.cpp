@@ -73,8 +73,6 @@ int majorVersion = 3, minorVersion = 0;
 
 // handle of the shader program
 
-Shader shaderSzines;
-
 // 2D camera
 struct Camera {
 	//vec4 wEye, wLookAt, wVup; //vagy vec3?
@@ -193,111 +191,12 @@ public:
 
 Camera camera;
 
-// 'Vegtelen' pontot tud tárolni 
-class LineStrip {
-	GLuint vao, vbo;        // vertex array object, vertex buffer object
-							//float  vertexData[100]; // interleaved data of coordinates and colors
-							//int    nVertices;       // number of vertices
-
-	vector<vec4> vertices; // Csúcsok
-	vec4 color;
-public:
-	LineStrip()
-		:vertices(200)
-	{
-		//nVertices = 0;
-	}
-	void create(float r, float g, float b)
-	{
-		setColor(r, g, b);
-		glGenVertexArrays(1, &vao);
-
-		glBindVertexArray(vao);
-
-
-		glGenBuffers(1, &vbo); // Generate 1 vertex buffer object
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		// Enable the vertex attribute arrays
-		glEnableVertexAttribArray(0);  // attribute array 0
-									   // Map attribute array 0 to the vertex data of the interleaved vbo
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), NULL); // attribute array, components/attribute, component type, normalize?, stride, offset
-		glBindVertexArray(0);
-	}
-
-	void addClickPoint(float x, float y) {
-
-		vec4 wVertex = vec4(x, y, 0, 1);
-		// EZ A JÓ SORREND !!!!!!!!!!!!!!!!!!!!!!
-		wVertex = (camera.Vinv()) *camera.Pinv()  * wVertex;
-
-		vertices.push_back(wVertex);
-
-		copyPointsToGPU();
-	}
-
-	void addPoint(float x, float y)
-	{
-
-		vec4 wVertex = vec4(x, y, 0, 1);
-		vertices.push_back(wVertex);
-
-		copyPointsToGPU();
-	}
-	void copyPointsToGPU()
-	{
-		int nVertices = vertices.size();
-		float* vertexData = new float[nVertices * 2];
-
-		for (int i = 0; i < nVertices; i++)
-		{
-			vertexData[2 * i] = vertices[i].v[0];  //X
-			vertexData[2 * i + 1] = vertices[i].v[1]; // Y
-		}
-
-		// copy data to the GPU
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, nVertices * 2 * sizeof(float), vertexData, GL_STATIC_DRAW);
-		glBindVertexArray(0);
-
-		delete[] vertexData;
-	}
-	void clearPoints()
-	{
-		vertices.clear();
-	}
-	void draw() {
-		glUseProgram(shaderSzines.shaderProgram);
-		if (vertices.size() > 0) {
-			loadColor();
-			camera.loadProjViewMatrixes(shaderSzines.shaderProgram);
-
-			mat4 vegeredmeny;
-			int location = shaderSzines.getUniform("transformation");
-			glUniformMatrix4fv(location, 1, GL_TRUE, vegeredmeny); // set uniform variable MVP to the MVPTransform
-
-			glBindVertexArray(vao);
-			glDrawArrays(GL_LINE_STRIP, 0, vertices.size());
-		}
-	}
-	void setColor(float r, float g, float b)
-	{
-		vec4 newColor(r, g, b);
-		color = newColor;
-	}
-	void loadColor()
-	{
-		int location = shaderSzines.getUniform("color");
-		glUniform3f(location, color.v[0], color.v[1], color.v[2]);
-	}
-};
 
 
 
 
 
 
-///TODO materialba valószínűleg sokkal kevesebb dolog kell
 
 
 
@@ -328,13 +227,19 @@ public:
 };
 
 Scene scene;
+
 // Initialization, create an OpenGL context
 void onInitialization() {
 	glViewport(0, 0, windowWidth, windowHeight);
 	glEnable(GL_DEPTH_TEST);
+	ShaderSzines* shaderSzines = new ShaderSzines();
+	shaderSzines->createShader();
+	shaderSzines->setColor(vec3(1, 0, 0));
 
-	Sphere* sphere = new Sphere(vec3(0.5f, 0.5f, 0), 0.5f);
-	shaderSzines.createShader();
+	Sphere* sphereGeometry = new Sphere(vec3(0.5f, 0.5f, 0), 0.5f);
+	GuruloKor guruloKor(shaderSzines,nullptr,nullptr,sphereGeometry);
+	
+
 	//scene.AddObject(sphere);
 
 	// Create objects by setting up their vertex data on the GPU
@@ -348,7 +253,7 @@ void onInitialization() {
 
 //=============================== ====================================EVENTS===================================================================================/
 void onExit() {
-	glDeleteProgram(shaderSzines.shaderProgram);
+	//glDeleteProgram(shaderSzines->shaderProgram);
 	printf("exit");
 }
 

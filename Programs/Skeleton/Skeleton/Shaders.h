@@ -1,7 +1,29 @@
 #pragma once
 
-struct RenderState;
+#include "RenderState_Light.h"
 class Shader
+{
+public:
+	unsigned int shaderProgram;
+	///TODO megirni altalanosabban
+	int getUniform(const char* uniformName)
+	{
+		int location = glGetUniformLocation(shaderProgram, uniformName);
+		if (location < 0)
+		{
+			printf("uniform %s cannot be set\n", uniformName);
+			throw "hibas lekeres"; // Ezt esetleg kivenni
+		}
+		return location;
+	}
+	virtual void Bind(RenderState& state) {
+		///TODO
+		glUseProgram(shaderProgram);
+		mat4 MVP = state.M * state.V * state.P;
+		MVP.SetUniform(shaderProgram, "MVP");
+	}
+};
+class ShaderSzines : public Shader
 {
 	const char *vertexSource = R"(
 	#version 130
@@ -30,13 +52,13 @@ class Shader
 )";
 
 public:
-
+	vec3 color;
 	//unsigned int programID;
-	unsigned int shaderProgram;
+	
 	//unsigned int vertexShaderID;  // Esetleg ezeket is eltárolni
 	//unsigned int fragmentShaderID;
 	// vertex shader in GLSL
-	Shader()
+	ShaderSzines()
 	{
 	}
 
@@ -90,21 +112,22 @@ public:
 		glBindAttribLocation(shaderProgram, 2, "uv"); // vertexPosition gets values from Attrib Array 0
 		glBindFragDataLocation(shaderProgram, 0, "fragmentColor");	// fragmentColor goes to the frame buffer memory
 	}
-	int getUniform(const char* uniformName)
+
+	void setColor(vec3 color)
 	{
-		int location = glGetUniformLocation(shaderProgram, uniformName);
-		if (location < 0)
-		{
-			printf("uniform %s cannot be set\n", uniformName);
-			throw "hibas lekeres"; // Ezt esetleg kivenni
-		}
-		return location;
+		vec3 newColor(color.x, color.y, color.z);
+		color = newColor;
+	}
+	void loadColor()
+	{
+		int location = getUniform("color");
+		glUniform3f(location, color.x, color.y, color.z);
 	}
 	void Bind(RenderState& state) {
 		///TODO
-		//glUseProgram(shaderProg);
-		//mat4 MVP = state.M * state.V * state.P;
-		//MVP.SetUniform(shaderProg, "MVP");
+		glUseProgram(shaderProgram);
+		mat4 MVP = state.M * state.V * state.P;
+		MVP.SetUniform(shaderProgram, "MVP");
+		loadColor();
 	}
-
 };

@@ -2,6 +2,7 @@
 
 #include "vectormath.h"
 
+///TODO materialba valószínûleg sokkal kevesebb dolog kell
 struct Material
 {
 	bool isWater;
