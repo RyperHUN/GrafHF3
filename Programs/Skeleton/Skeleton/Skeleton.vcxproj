@@ -79,6 +79,12 @@
   <ItemGroup>
     <ClInclude Include="..\VectorMath.h" />
     <ClInclude Include="ErrorHandler.h" />
+    <ClInclude Include="Geometry.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="Objects.h" />
+    <ClInclude Include="RenderState_Light.h" />
+    <ClInclude Include="Shaders.h" />
+    <ClInclude Include="Texture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
