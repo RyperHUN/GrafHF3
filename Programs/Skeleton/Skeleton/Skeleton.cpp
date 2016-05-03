@@ -55,6 +55,8 @@ const unsigned int windowWidth = 600, windowHeight = 600;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Innentol modosithatod...
 
+#include "vectormath.h"
+
 using namespace std;
 
 //Verziokezelés tesztü
@@ -91,142 +93,6 @@ void checkLinking(unsigned int program) {
 		printf("Failed to link shader program!\n");
 		getErrorInfo(program);
 	}
-}
-
-class vec4;
-
-// row-major matrix 4x4
-// Utolsó oszlopba lesznek a dolgok tehát a Column Major formátumt használom + jobbrol kell vektorral szorozni
-class mat4 {
-public:
-	float m[4][4];
-	mat4(float m00 = 1, float m01 = 0, float m02 = 0, float m03 = 0,
-		float m10 = 0, float m11 = 1, float m12 = 0, float m13 = 0,
-		float m20 = 0, float m21 = 0, float m22 = 1, float m23 = 0,
-		float m30 = 0, float m31 = 0, float m32 = 0, float m33 = 1) {
-		m[0][0] = m00; m[0][1] = m01; m[0][2] = m02; m[0][3] = m03;
-		m[1][0] = m10; m[1][1] = m11; m[1][2] = m12; m[1][3] = m13;
-		m[2][0] = m20; m[2][1] = m21; m[2][2] = m22; m[2][3] = m23;
-		m[3][0] = m30; m[3][1] = m31; m[3][2] = m32; m[3][3] = m33;
-	}
-
-	mat4 operator*(const mat4& right) {
-		mat4 result;
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				result.m[i][j] = 0;
-				for (int k = 0; k < 4; k++) result.m[i][j] += m[i][k] * right.m[k][j];
-			}
-		}
-		return result;
-	}
-	void eltolas(float x = 0, float y = 0, float z = 0)
-	{
-		//Utolso oszlop beallitasa
-		m[0][3] = x;
-		m[1][3] = y;
-		m[2][3] = z;
-	}
-	void projekcio(float x = 1, float y = 1, float z = 1)
-	{
-		m[0][0] = x;
-		m[1][1] = y;
-		m[2][2] = z;
-	}
-	void forgatZ(float szogFok)
-	{
-		//Valamiért kell egy minusz különben az óramutatóval ellentétesen forgat
-		float radian = -szogFok / 180 * M_PI;
-		m[0][0] = cosf(radian);
-		m[1][0] = sinf(radian);
-		m[0][1] = -sinf(radian);
-		m[1][1] = cosf(radian);
-	}
-	mat4 operator=(const mat4& right)
-	{
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				m[i][j] = right.m[i][j];
-			}
-		}
-		return (*this);
-	}
-	vec4 operator*(const vec4& right);
-	operator float*() { return &m[0][0]; }
-};
-
-
-// 3D point in homogeneous coordinates
-class vec4 {
-public:
-	float v[4];
-
-	vec4(float x = 0, float y = 0, float z = 0, float w = 1) {
-		v[0] = x; v[1] = y; v[2] = z; v[3] = w;
-	}
-
-	vec4 operator*(const mat4& mat) {
-		vec4 result;
-		for (int j = 0; j < 4; j++) {
-			result.v[j] = 0;
-			for (int i = 0; i < 4; i++) result.v[j] += v[i] * mat.m[i][j];
-		}
-		return result;
-	}
-	vec4 operator*(const float skalar)
-	{
-		vec4 result;
-		for (int i = 0; i < 4; i++)
-			result.v[i] = v[i] * skalar;
-		return result;
-	}
-	vec4 operator+(const vec4& right) // compound assignment (does not need to be a member,
-	{                           // but often is, to modify the private members)
-		vec4 result;
-		for (int i = 0; i < 4; i++)
-			result.v[i] = right.v[i] + v[i];
-
-		return result; // return the result by reference
-	}
-	vec4 operator-(const vec4& right)
-	{
-		return vec4(v[0] - right.v[0], v[1] - right.v[1], v[2] - right.v[2], v[3] - right.v[3]);
-	}
-	vec4 operator/(const float& right)
-	{
-		vec4 eredmeny;
-		/*	if (right != 0.0f)
-		{*/
-		vec4 uj(v[0] / right, v[1] / right, v[2] / right, v[3] / right);
-		eredmeny = uj;
-		//}
-
-		return eredmeny;
-	}
-
-	float length() const
-	{
-		return sqrtf(v[0] * v[0] + v[1] * v[1]);
-	}
-};
-
-vec4 operator*(float &szam, vec4& right)
-{
-	return right* szam;
-}
-
-// Jobbrol szorzas vektorral // Vektor jobbrol matrix
-vec4 mat4::operator*(const vec4& right)
-{
-	vec4 result;
-	for (int i = 0; i < 4; i++) {
-		result.v[i] = 0;
-		for (int j = 0; j < 4; j++) {
-
-			result.v[i] += m[i][j] * right.v[j];
-		}
-	}
-	return result;
 }
 
 class Shader
