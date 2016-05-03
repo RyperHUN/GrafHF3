@@ -6,14 +6,13 @@ class Shader
 	const char *vertexSource = R"(
 	#version 130
     	precision highp float;
-	uniform mat4 transformation;	 
-	uniform mat4 projection;
-	uniform mat4 view;
+	uniform mat4 MVP;
 	
-	in vec2 vertexPosition;		// variable input from Attrib Array selected by glBindAttribLocation
-
+	in vec3 vertexPosition;		// variable input from Attrib Array selected by glBindAttribLocation
+	in vec3 normal;
+	in vec2 uv;
 													void main() {
-		gl_Position = projection * view * transformation * vec4(vertexPosition.x, vertexPosition.y, 0, 1) ; 		// transform to clipping space
+		gl_Position = vec4(vertexPosition, 1) * MVP; 		// transform to clipping space
 	}
 )";
 
@@ -87,6 +86,8 @@ public:
 	{
 		// Connect Attrib Arrays to input variables of the vertex shader
 		glBindAttribLocation(shaderProgram, 0, "vertexPosition"); // vertexPosition gets values from Attrib Array 0
+		glBindAttribLocation(shaderProgram, 1, "normal"); // vertexPosition gets values from Attrib Array 0
+		glBindAttribLocation(shaderProgram, 2, "uv"); // vertexPosition gets values from Attrib Array 0
 		glBindFragDataLocation(shaderProgram, 0, "fragmentColor");	// fragmentColor goes to the frame buffer memory
 	}
 	int getUniform(const char* uniformName)

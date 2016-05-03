@@ -331,7 +331,8 @@ Scene scene;
 // Initialization, create an OpenGL context
 void onInitialization() {
 	glViewport(0, 0, windowWidth, windowHeight);
-	
+	glEnable(GL_DEPTH_TEST);
+
 	Sphere* sphere = new Sphere(vec3(0.5f, 0.5f, 0), 0.5f);
 	shaderSzines.createShader();
 	//scene.AddObject(sphere);
