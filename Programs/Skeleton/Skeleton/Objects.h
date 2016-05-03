@@ -19,7 +19,7 @@ public:
 		rotAxis = vec3(0, 0, 0);
 		rotAngle = 0;
 	}
-	void Draw(RenderState state) {  //RenderState mi az a renderstate?
+	virtual void Draw(RenderState state) {  //RenderState mi az a renderstate?
 		state.M = Scale(scale.x, scale.y, scale.z) *
 			Rotate(rotAngle, rotAxis.x, rotAxis.y, rotAxis.z) *
 			Translate(pos.x, pos.y, pos.z);
@@ -42,17 +42,21 @@ class GuruloKor : public Object {
 	float rotAngle;
 public:
 	GuruloKor(Shader * shader,Material* material,Texture * texture, Geometry* geometry)
-		: shader(shader),material(material),texture(texture),geometry(geometry)
+		:shader(shader),material(material),texture(texture),geometry(geometry)
 	{
-		///TODO scale stb
+		scale = vec3(1, 1, 1);
+		pos = vec3(0, 0, -5);
+		rotAxis = vec3(0, 0, 0);
+		rotAngle = 0;
 	}
 	void Draw(RenderState state) {  //RenderState mi az a renderstate?
-		state.M = Scale(scale.x, scale.y, scale.z) *
-			Rotate(rotAngle, rotAxis.x, rotAxis.y, rotAxis.z) *
-			Translate(pos.x, pos.y, pos.z);
-		state.Minv = Translate(-pos.x, -pos.y, -pos.z) *
-			Rotate(-rotAngle, rotAxis.x, rotAxis.y, rotAxis.z) *
-			Scale(1 / scale.x, 1 / scale.y, 1 / scale.z);
+		mat4 Mscale = Scale(scale.x, scale.y, scale.z);
+		mat4 Mrotate = Rotate(rotAngle, rotAxis.x, rotAxis.y, rotAxis.z);
+		mat4 Mtranslate = Translate(pos.x, pos.y, pos.z);
+		state.M = Mscale*Mrotate*Mtranslate;
+		//state.Minv = Translate(-pos.x, -pos.y, -pos.z) *
+		//	Rotate(-rotAngle, rotAxis.x, rotAxis.y, rotAxis.z) *
+		//	Scale(1 / scale.x, 1 / scale.y, 1 / scale.z);
 		state.material = material; state.texture = texture;
 		shader->Bind(state);
 		geometry->Draw();

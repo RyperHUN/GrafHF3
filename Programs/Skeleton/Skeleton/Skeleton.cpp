@@ -73,6 +73,7 @@ int majorVersion = 3, minorVersion = 0;
 
 // handle of the shader program
 
+///TODO itt minden matrix
 // 2D camera
 struct Camera {
 	//vec4 wEye, wLookAt, wVup; //vagy vec3?
@@ -113,6 +114,7 @@ public:
 	//		0, 0, 1, 0,
 	//		0, 0, 0, 1);
 	//}
+	///TODO
 	mat4 P() { // projection matrix
 		float sy = 1 / tan(fov / 2);
 		return mat4(sy / asp, 0.0f, 0.0f, 0.0f,
@@ -189,8 +191,6 @@ public:
 
 //2D camera
 
-Camera camera;
-
 
 
 
@@ -208,6 +208,10 @@ class Scene {
 	Light light;
 	RenderState state;
 public:
+	///TODO megirni hogy inicializaljon mindent
+	Scene()
+	{
+	}
 	void AddObject(Object* obj)
 	{
 		objects.push_back(obj);
@@ -222,7 +226,8 @@ public:
 	}
 
 	void Animate(float dt) {
-		for (Object * obj : objects) obj->Animate(dt);
+		for (Object * obj : objects) 
+			obj->Animate(dt);
 	}
 };
 
@@ -236,11 +241,15 @@ void onInitialization() {
 	shaderSzines->createShader();
 	shaderSzines->setColor(vec3(1, 0, 0));
 
-	Sphere* sphereGeometry = new Sphere(vec3(0.5f, 0.5f, 0), 0.5f);
-	GuruloKor guruloKor(shaderSzines,nullptr,nullptr,sphereGeometry);
-	
+	Material* tesztPiros = new Material(vec3(0.2f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0), 20, true, false);
 
-	//scene.AddObject(sphere);
+	Sphere* sphereGeometry = new Sphere(vec3(0.5f, 0.5f, -2), 0.5f);
+	GuruloKor* guruloKor = new GuruloKor(shaderSzines, tesztPiros,nullptr,sphereGeometry);
+	RenderState state;
+	state.wEye = vec3(0, 0, 1);
+	guruloKor->Draw(state);
+	scene.AddObject(guruloKor);
+	
 
 	// Create objects by setting up their vertex data on the GPU
 	
@@ -262,8 +271,7 @@ void onDisplay() {
 	glClearColor(0, 0, 0, 0);							// background color 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the screen
 
-														//triangle.Draw();
-														//linestrip.draw();
+	scene.Render();
 
 
 	glutSwapBuffers();									// exchange the two buffers
@@ -277,21 +285,7 @@ const float cameraSpeed = 0.5f;
 // RF - Kamera zoom
 // Space - Csillag focus ON/OFF
 void onKeyboard(unsigned char key, int pX, int pY) {
-
-	if (key == 'd')
-		camera.wCx += cameraSpeed;
-	else if (key == 'a')
-		camera.wCx -= cameraSpeed;
-	else if (key == 'w')
-		camera.wCy += cameraSpeed;
-	else if (key == 's')
-		camera.wCy -= cameraSpeed;
-	else if (key == 'f')
-		camera.increaseScale(0.1f, 0.1f);
-	else if (key == 'r')
-		camera.increaseScale(-0.1f, -0.1f);
-	else if (key == ' ')
-		camera.toggleFollow();
+	
 }
 
 // Key of ASCII code released

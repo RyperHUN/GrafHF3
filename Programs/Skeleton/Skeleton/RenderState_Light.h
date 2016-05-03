@@ -16,4 +16,7 @@ struct RenderState {
 	Light light;
 	///TODO light?? esetleg pointer
 	vec3 wEye;
+	RenderState() 
+	{
+	}
 };

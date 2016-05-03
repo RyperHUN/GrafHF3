@@ -5,25 +5,20 @@
 ///TODO materialba valószínûleg sokkal kevesebb dolog kell
 struct Material
 {
+	vec3 F0;
+	vec3 ka, kd, ks;  // Ks - anyag szine ! , Ks - spekularis resze, ami visszaverodik
+	float shininess;
 	bool isWater;
 	bool isReflect;
 	bool isRefract;
 	///TODO irni konstruktort ami alapbol mindent 0 ba rak
-	Material()
+	Material(vec3 ka,vec3 kd,vec3 ks,float shininess,bool isReflect,bool isRefract)
+		: ka(ka),kd(kd),ks(ks),shininess(shininess),isReflect(isReflect),isRefract(isRefract)
 	{
 		isWater = false;
-		isReflect = false;
-		isRefract = false;
 	}
 	//TYPES::Material materialType;
-	vec3 F0;  // F0 = ( (n-1)^2 + k^2 ) / ( (n+1)^2 + k^2 )
-			  //vec3 n;  //Femeknel meg uvegnel nem nulla egyebkent szinte mindig 0 meg ebbol adodoan az F0 konstans
-
-	vec3 ka;
-	//CSAK ROUGH MATERIALNAL AZ ALSOK
-	vec3 kd, ks;  // Ks - anyag szine ! , Ks - spekularis resze, ami visszaverodik
-	float shininess;
-	//IDAIG
+	
 
 	bool isReflective() { return isReflect; }
 	bool isRefractive() { return isRefract; }
@@ -35,7 +30,7 @@ struct Material
 
 		return inDir - normal * (dot(normal, inDir) * 2.0f);
 	}
-	virtual vec3 refract(vec3 inDir, vec3 normal) = 0;
+	virtual vec3 refract(vec3 inDir, vec3 normal) { return vec3(0, 0, 0); }
 	virtual void calcF0() {}
 
 	vec3 Fresnel(vec3 inDir, vec3 normal)

@@ -233,15 +233,20 @@ vec3 mat4::operator*(const vec3& sima)
 	return vec3(result.v[0], result.v[1], result.v[2]);
 }
 
-///TODO 
+
 mat4 Scale(float x, float y, float z)
 {
-	return mat4();
+	mat4 scale;
+	scale.projekcio(x, y, z);
+	return scale;
 }
 mat4 Translate(float x, float y, float z)
 {
-	return mat4();
+	mat4 eltolas;
+	eltolas.eltolas(x, y, z);
+	return eltolas;
 }
+///TODO 
 //TODO Rodrigues
 mat4 Rotate(float rotAngle, float xAxis, float yAxis, float zAxis)
 {
