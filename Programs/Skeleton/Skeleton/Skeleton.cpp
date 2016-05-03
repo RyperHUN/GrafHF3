@@ -64,7 +64,7 @@ using namespace std;
 int majorVersion = 3, minorVersion = 0;
 
 
-
+struct RenderState;
 class Shader
 {
 	const char *vertexSource = R"(
@@ -163,6 +163,13 @@ public:
 		}
 		return location;
 	}
+	void Bind(RenderState& state) {
+		///TODO
+		//glUseProgram(shaderProg);
+		//mat4 MVP = state.M * state.V * state.P;
+		//MVP.SetUniform(shaderProg, "MVP");
+	}
+
 };
 // handle of the shader program
 
@@ -170,6 +177,10 @@ Shader shaderSzines;
 
 // 2D camera
 struct Camera {
+	//vec4 wEye, wLookAt, wVup; //vagy vec3?
+	vec3  wEye, wLookat, wVup; ///Most akkor vec3???
+	float fov, asp, fp, bp;
+
 	float wCx, wCy;	// center in world coordinates
 	float wWx, wWy;	// width and height in world coordinates
 	bool isFollowing;
@@ -179,18 +190,37 @@ public:
 		isFollowing = false;
 	}
 
-	mat4 V() { // view matrix: translates the center to the origin
-		return mat4(1, 0, 0, -wCx,
-			0, 1, 0, -wCy,
-			0, 0, 1, 0,
-			0, 0, 0, 1);
+	//mat4 V() { // view matrix: translates the center to the origin
+	//	return mat4(1, 0, 0, -wCx,
+	//		0, 1, 0, -wCy,
+	//		0, 0, 1, 0,
+	//		0, 0, 0, 1);
+	//}
+	///TODO inverzét megcsinálni!
+	mat4 V() { // view matrix
+		vec3 w = (wEye - wLookat).normalize();
+		vec3 u = cross(wVup, w).normalize();
+		vec3 v = cross(w, u);
+		return Translate(-wEye.x, -wEye.y, -wEye.z) *
+			mat4(u.x, v.x, w.x, 0.0f,
+				u.y, v.y, w.y, 0.0f,
+				u.z, v.z, w.z, 0.0f,
+				0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
-	mat4 P() { // projection matrix: scales it to be a square of edge length 2
-		return mat4(2 / wWx, 0, 0, 0,
-			0, 2 / wWy, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1);
+
+	//mat4 P() { // projection matrix: scales it to be a square of edge length 2
+	//	return mat4(2 / wWx, 0, 0, 0,
+	//		0, 2 / wWy, 0, 0,
+	//		0, 0, 1, 0,
+	//		0, 0, 0, 1);
+	//}
+	mat4 P() { // projection matrix
+		float sy = 1 / tan(fov / 2);
+		return mat4(sy / asp, 0.0f, 0.0f, 0.0f,
+			0.0f, sy, 0.0f, 0.0f,
+			0.0f, 0.0f, -(fp + bp) / (bp - fp), -1.0f,
+			0.0f, 0.0f, -2 * fp*bp / (bp - fp), 0.0f);
 	}
 
 	mat4 Vinv() { // inverse view matrix
@@ -361,6 +391,228 @@ public:
 		glUniform3f(location, color.v[0], color.v[1], color.v[2]);
 	}
 };
+
+struct Light {
+	vec3 La, Le; // Ambiens meg feny intenzitás
+	vec4 wLightPos; //Irany fenyforras ugy lesz ebbol ha 4. koordinata 0	
+};
+
+class Geometry {
+public:
+	unsigned int vao, nVtx;
+
+	Geometry() {
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+	}
+
+	virtual void Draw() = 0;
+	//TODO texturazva rajzol
+	//void Geometry::Draw() {
+	//	int samplerUnit = GL_TEXTURE0; // GL_TEXTURE1, …
+	//	int location = glGetUniformLocation(shaderProg, "samplerUnit");
+	//	glUniform1i(location, samplerUnit);
+	//	glActiveTexture(samplerUnit);
+	//	glBindTexture(GL_TEXTURE_2D, texture.textureId);
+
+	//	glBindVertexArray(vao); glDrawArrays(GL_TRIANGLES, 0, nVtx);
+	//}
+
+};
+
+class PolygonMesh : public Geometry {
+public:
+	virtual void Draw() = 0;
+};
+
+struct VertexData{
+	vec3 position, normal;
+	float u, v;
+};
+
+class ParamSurface : public Geometry {
+public:
+	//virtual void Draw() = 0;
+	virtual void Create(int, int) = 0;
+	///TODO ez a hierarhiában lehet feljebb is mehet
+	void Draw() {
+		glBindVertexArray(vao);
+		glDrawArrays(GL_TRIANGLES, 0, nVtx);
+	}
+};
+
+///TODO itt mar nem virtualisak a fuggvenyek
+class Sphere : public ParamSurface {
+	vec3 center;
+	float radius;
+public:
+	Sphere(vec3 c, float r) : center(c), radius(r) {
+		Create(16, 8); // tessellation level
+	}
+	virtual void Create(int N, int M) {
+		nVtx = N * M * 6;
+		unsigned int vbo;
+		glGenBuffers(1, &vbo); glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+		VertexData *vtxData = new VertexData[nVtx], *pVtx = vtxData;
+		for (int i = 0; i < N; i++) for (int j = 0; j < M; j++) {
+			*pVtx++ = GenVertexData((float)i / N, (float)j / M);
+			*pVtx++ = GenVertexData((float)(i + 1) / N, (float)j / M);
+			*pVtx++ = GenVertexData((float)i / N, (float)(j + 1) / M);
+			*pVtx++ = GenVertexData((float)(i + 1) / N, (float)j / M);
+			*pVtx++ = GenVertexData((float)(i + 1) / N, (float)(j + 1) / M);
+			*pVtx++ = GenVertexData((float)i / N, (float)(j + 1) / M);
+		}
+
+		int stride = sizeof(VertexData), sVec3 = sizeof(vec3);
+		glBufferData(GL_ARRAY_BUFFER, nVtx * stride, vtxData, GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(0);  // AttribArray 0 = POSITION
+		glEnableVertexAttribArray(1);  // AttribArray 1 = NORMAL
+		glEnableVertexAttribArray(2);  // AttribArray 2 = UV
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)sVec3);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(2 * sVec3));
+	}
+
+	VertexData GenVertexData(float u, float v) {
+		VertexData vd;
+		vd.normal = vec3(cos(u * 2 * M_PI) * sin(v*M_PI),
+			sin(u * 2 * M_PI) * sin(v*M_PI),
+			cos(v*M_PI));
+		vd.position = vd.normal * radius + center;
+		vd.u = u; vd.v = v;
+		return vd;
+	}
+};
+
+
+///TODO materialba valószínűleg sokkal kevesebb dolog kell
+struct Material
+{
+	bool isWater;
+	bool isReflect;
+	bool isRefract;
+	///TODO irni konstruktort ami alapbol mindent 0 ba rak
+	Material()
+	{
+		isWater = false;
+		isReflect = false;
+		isRefract = false;
+	}
+	//TYPES::Material materialType;
+	vec3 F0;  // F0 = ( (n-1)^2 + k^2 ) / ( (n+1)^2 + k^2 )
+			  //vec3 n;  //Femeknel meg uvegnel nem nulla egyebkent szinte mindig 0 meg ebbol adodoan az F0 konstans
+
+	vec3 ka;
+	//CSAK ROUGH MATERIALNAL AZ ALSOK
+	vec3 kd, ks;  // Ks - anyag szine ! , Ks - spekularis resze, ami visszaverodik
+	float shininess;
+	//IDAIG
+
+	bool isReflective() { return isReflect; }
+	bool isRefractive() { return isRefract; }
+
+	vec3 reflect(vec3 &inDir, vec3 &normal)
+	{
+		inDir = inDir.normalize();
+		normal = normal.normalize();
+
+		return inDir - normal * (dot(normal, inDir) * 2.0f);
+	}
+	virtual vec3 refract(vec3 inDir, vec3 normal) = 0;
+	virtual void calcF0() {}
+
+	vec3 Fresnel(vec3 inDir, vec3 normal)
+	{
+		float cosa = fabs(dot(normal, inDir));
+		return F0 + (vec3(1, 1, 1) - F0) * pow(1 - cosa, 5);
+	}
+	//Ezis rough materialnak kell
+	vec3 shade(vec3 normal, vec3 viewDir, vec3 lightDir,
+		vec3 inRad)
+	{
+		vec3 reflRad(0, 0, 0);
+		float cosTheta = dot(normal, lightDir);
+		if (cosTheta < 0)
+			return reflRad;
+		reflRad = inRad * kd * cosTheta;
+		vec3 halfway = (viewDir + lightDir).normalize();
+		float cosDelta = dot(normal, halfway);
+		if (cosDelta < 0)
+			return reflRad;
+		return reflRad + inRad * ks * pow(cosDelta, shininess);
+	}
+};
+
+struct Texture {
+	unsigned int textureId;
+	Texture(char * fname) {
+		glGenTextures(1, &textureId);
+		glBindTexture(GL_TEXTURE_2D, textureId);    // binding
+		int width, height;
+		///TODO loadimage
+		//float *image = LoadImage(fname, width, height); // megírni!
+		float* image = nullptr;
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height,
+			0, GL_RGB, GL_FLOAT, image); //Texture -> OpenGL
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	}
+};
+
+
+struct RenderState{
+	mat4 M, V, P, Minv;
+	Material* material;
+	Texture* texture;
+	Light light;
+	///TODO light?? esetleg pointer
+	vec3 wEye;
+};
+
+class Object {
+	Shader *   shader;
+	Material * material;
+	Texture *  texture;
+	Geometry * geometry;
+	vec3 scale, pos, rotAxis;
+	float rotAngle;
+public:
+	void Draw(RenderState state) {  //RenderState mi az a renderstate?
+		state.M = Scale(scale.x, scale.y, scale.z) *
+			Rotate(rotAngle, rotAxis.x, rotAxis.y, rotAxis.z) *
+			Translate(pos.x, pos.y, pos.z);
+		state.Minv = Translate(-pos.x, -pos.y, -pos.z) *
+			Rotate(-rotAngle, rotAxis.x, rotAxis.y, rotAxis.z) *
+			Scale(1 / scale.x, 1 / scale.y, 1 / scale.z);
+		state.material = material; state.texture = texture;
+		shader->Bind(state);
+		geometry->Draw();
+	}
+	virtual void Animate(float dt) {}
+};
+
+
+class Scene {
+	Camera camera;
+	vector<Object *> objects;
+	Light light;
+	RenderState state;
+public:
+	void Render() {
+		state.wEye = camera.wEye;
+		state.V = camera.V();
+		state.P = camera.P();
+		state.light = light;
+		for (Object * obj : objects) obj->Draw(state);
+	}
+
+	void Animate(float dt) {
+		for (Object * obj : objects) obj->Animate(dt);
+	}
+};
+
 
 // Initialization, create an OpenGL context
 void onInitialization() {
