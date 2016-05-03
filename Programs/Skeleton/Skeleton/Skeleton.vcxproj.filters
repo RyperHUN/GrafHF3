@@ -23,5 +23,8 @@
     <ClInclude Include="..\VectorMath.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="ErrorHandler.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
