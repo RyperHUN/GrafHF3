@@ -244,10 +244,13 @@ void onInitialization() {
 	shaderSzines->createShader();
 	shaderSzines->setColor(vec3(1, 0, 0));
 
+	ShaderFennyel* shaderFennyel = new ShaderFennyel();
+	shaderFennyel->createShader();
+
 	Material* tesztPiros = new Material(vec3(0.2f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0), 20, true, false);
 
 	Sphere* sphereGeometry = new Sphere(vec3(0, 0, -2), 4);
-	GuruloKor* guruloKor = new GuruloKor(shaderSzines, tesztPiros,nullptr,sphereGeometry);
+	GuruloKor* guruloKor = new GuruloKor(shaderFennyel, tesztPiros,nullptr,sphereGeometry);
 	RenderState state;
 	state.wEye = vec3(0, 0, 1);
 	guruloKor->Draw(state);
