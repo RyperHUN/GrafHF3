@@ -136,7 +136,7 @@ public:
 			throw "hibas lekeres"; // Ezt esetleg kivenni
 		}
 		else
-			glUniformMatrix4fv(location, 1, GL_FALSE, *this); ///TODO False vagy true kell??
+			glUniformMatrix4fv(location, 1, GL_TRUE, *this); ///TODO False vagy true kell??
 	}
 };
 

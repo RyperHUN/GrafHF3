@@ -246,7 +246,7 @@ void onInitialization() {
 
 	Material* tesztPiros = new Material(vec3(0.2f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0), 20, true, false);
 
-	Sphere* sphereGeometry = new Sphere(vec3(0, 0, -2), 1);
+	Sphere* sphereGeometry = new Sphere(vec3(0, 0, -2), 4);
 	GuruloKor* guruloKor = new GuruloKor(shaderSzines, tesztPiros,nullptr,sphereGeometry);
 	RenderState state;
 	state.wEye = vec3(0, 0, 1);
