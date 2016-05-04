@@ -138,6 +138,7 @@ public:
 		glBindFragDataLocation(shaderProgram, 0, "fragmentColor");	// fragmentColor goes to the frame buffer memory
 	}
 	void Bind(RenderState& state) {
+		//====================== VERTEX SHADER TOLTES ================================//
 		glUseProgram(shaderProgram);
 		mat4 MVP = state.M * state.V * state.P;
 		MVP.SetUniform(shaderProgram, "MVP");
@@ -151,7 +152,26 @@ public:
 		Light light = state.light;
 		location = getUniform("wLiPos");
 		glUniform4f(location, light.wLightPos.v[0], light.wLightPos.v[1], light.wLightPos.v[2], light.wLightPos.v[3]);
+		//====================== VERTEX SHADER BETOLTVE ================================//
+		
+		//====================== FRAGMENT SHADER TOLTES ================================//
+		location = getUniform("kd");
+		vec3 kd = state.material->kd;
+		glUniform3f(location, kd.x, kd.y, kd.z);
 
+		location = getUniform("ks");
+		vec3 ks = state.material->ks;
+		glUniform3f(location, ks.x, ks.y, ks.z);
+
+		location = getUniform("ka");
+		vec3 ka = state.material->ka;
+		glUniform3f(location, ka.x, ka.y, ka.z);
+
+		//Feny
+		location = getUniform("La");
+		glUniform3f(location, light.La.x, light.La.y, light.La.z);
+		location = getUniform("Le");
+		glUniform3f(location, light.Le.x, light.Le.y, light.Le.z);
 
 	}
 };
