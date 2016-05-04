@@ -76,15 +76,17 @@ int majorVersion = 3, minorVersion = 0;
 ///TODO itt minden matrix
 // 2D camera
 struct Camera {
-	//vec4 wEye, wLookAt, wVup; //vagy vec3?
 	vec3  wEye, wLookat, wVup; ///Most akkor vec3???
-	float fov, asp, fp, bp;
+	float fov, asp, nearPlane, farPlane;
 
 	float wCx, wCy;	// center in world coordinates
 	float wWx, wWy;	// width and height in world coordinates
 	bool isFollowing;
 public:
-	Camera() {
+	Camera(vec3 wEye,vec3 wLookat,vec3 wVup,float fov,float nearPlane,float farPlane) 
+		: wEye(wEye),wLookat(wLookat),wVup(wVup),fov(fov),nearPlane(nearPlane),farPlane(farPlane)
+	{
+		asp = 1;
 		Animate(0);
 		isFollowing = false;
 	}
@@ -119,8 +121,8 @@ public:
 		float sy = 1 / tan(fov / 2);
 		return mat4(sy / asp, 0.0f, 0.0f, 0.0f,
 			0.0f, sy, 0.0f, 0.0f,
-			0.0f, 0.0f, -(fp + bp) / (bp - fp), -1.0f,
-			0.0f, 0.0f, -2 * fp*bp / (bp - fp), 0.0f);
+			0.0f, 0.0f, -(nearPlane + farPlane) / (farPlane - nearPlane), -1.0f,
+			0.0f, 0.0f, -2 * nearPlane*farPlane / (farPlane - nearPlane), 0.0f);
 	}
 
 	mat4 Vinv() { // inverse view matrix
@@ -210,6 +212,7 @@ class Scene {
 public:
 	///TODO megirni hogy inicializaljon mindent
 	Scene()
+		: camera(vec3(0,0,1),vec3(0,0,-1),vec3(0,1,0),90,0.1,10)
 	{
 	}
 	void AddObject(Object* obj)
@@ -243,13 +246,15 @@ void onInitialization() {
 
 	Material* tesztPiros = new Material(vec3(0.2f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0), 20, true, false);
 
-	Sphere* sphereGeometry = new Sphere(vec3(0.5f, 0.5f, -2), 0.5f);
+	Sphere* sphereGeometry = new Sphere(vec3(0, 0, -2), 1);
 	GuruloKor* guruloKor = new GuruloKor(shaderSzines, tesztPiros,nullptr,sphereGeometry);
 	RenderState state;
 	state.wEye = vec3(0, 0, 1);
 	guruloKor->Draw(state);
 	scene.AddObject(guruloKor);
 	
+	long i = 0;
+	while (i++ < 100000000);
 
 	// Create objects by setting up their vertex data on the GPU
 	

@@ -34,7 +34,8 @@ class ShaderSzines : public Shader
 	in vec3 normal;
 	in vec2 uv;
 													void main() {
-		gl_Position = vec4(vertexPosition, 1) * MVP; 		// transform to clipping space
+		gl_Position = vec4(vertexPosition.x,vertexPosition.y,vertexPosition.z, 1) * MVP; 		// transform to clipping space
+
 	}
 )";
 
@@ -43,10 +44,10 @@ class ShaderSzines : public Shader
 	#version 130
     	precision highp float;
 	uniform vec3 color;
-									//in vec3 color;				// variable input: interpolated color of vertex shader
+
 	out vec4 fragmentColor;		// output that goes to the raster memory as told by glBindFragDataLocation
 
-							void main() {
+									void main() {
 		fragmentColor = vec4(color, 1); // extend RGB to RGBA
 	}
 )";
@@ -119,12 +120,13 @@ public:
 		color = newColor;
 	}
 	void loadColor()
-	{
+	{	
 		int location = getUniform("color");
 		glUniform3f(location, color.x, color.y, color.z);
 	}
 	void Bind(RenderState& state) {
 		///TODO
+		loadColor();
 		glUseProgram(shaderProgram);
 		mat4 MVP = state.M * state.V * state.P;
 		MVP.SetUniform(shaderProgram, "MVP");
