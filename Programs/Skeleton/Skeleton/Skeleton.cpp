@@ -290,8 +290,17 @@ const float cameraSpeed = 0.5f;
 // WASD- Kamera mozgatasa
 // RF - Kamera zoom
 // Space - Csillag focus ON/OFF
+static bool ONLYLINES = false;
 void onKeyboard(unsigned char key, int pX, int pY) {
-	
+	if (key == 't')  // Bekapcsolja a megjelenitest a racsvonalaknak
+	{
+		ONLYLINES = !ONLYLINES;
+		if(ONLYLINES)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		else
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+		
 }
 
 // Key of ASCII code released
