@@ -250,5 +250,12 @@ mat4 Translate(float x, float y, float z)
 //TODO Rodrigues
 mat4 Rotate(float rotAngle, float xAxis, float yAxis, float zAxis)
 {
-	return mat4();
+	mat4 rodriguez
+		(
+			cos(rotAngle) + xAxis*xAxis*(1 - cos(rotAngle)), yAxis*zAxis*(1 - cos(rotAngle)) - zAxis*sin(rotAngle), xAxis*zAxis*(1 - cos(rotAngle)) + yAxis*sin(rotAngle), 0,
+			yAxis*xAxis*(1 - cos(rotAngle)) + zAxis*sin(rotAngle), cos(rotAngle) + yAxis*yAxis*(1 - cos(rotAngle)), yAxis*zAxis*(1 - cos(rotAngle)) - xAxis*sin(rotAngle), 0,
+			zAxis*xAxis*(1 - cos(rotAngle)) - yAxis*sin(rotAngle), zAxis*yAxis*(1-cos(rotAngle))+xAxis*sin(rotAngle), cos(rotAngle)+zAxis*zAxis*(1-cos(rotAngle)),0,
+			0,0,0,1
+		);
+	return rodriguez;
 }
