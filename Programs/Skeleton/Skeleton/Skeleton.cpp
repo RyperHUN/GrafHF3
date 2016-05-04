@@ -212,7 +212,9 @@ class Scene {
 public:
 	///TODO megirni hogy inicializaljon mindent
 	Scene()
-		: camera(vec3(0,0,1),vec3(0,0,-1),vec3(0,1,0),90,0.1,10)
+		: camera(vec3(0,0,1),vec3(0,0,-1),vec3(0,1,0),90,0.1,10),
+		  light(vec4(1,1,0,0),vec3(0.6f,0.6f,0.6f),vec3(0.6f,0.6f,0.6f)),
+		  state(light)
 	{
 	}
 	void AddObject(Object* obj)
@@ -251,13 +253,9 @@ void onInitialization() {
 
 	Sphere* sphereGeometry = new Sphere(vec3(0, 0, -2), 4);
 	GuruloKor* guruloKor = new GuruloKor(shaderFennyel, tesztPiros,nullptr,sphereGeometry);
-	RenderState state;
-	state.wEye = vec3(0, 0, 1);
-	guruloKor->Draw(state);
+
 	scene.AddObject(guruloKor);
 	
-	long i = 0;
-	while (i++ < 100000000);
 
 	// Create objects by setting up their vertex data on the GPU
 	
