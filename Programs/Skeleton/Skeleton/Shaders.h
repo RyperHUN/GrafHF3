@@ -45,15 +45,16 @@ class ShaderSzines : public Shader
     	precision highp float;
 	uniform vec3 color;
 
-	out vec4 fragmentColor;		// output that goes to the raster memory as told by glBindFragDataLocation
+			out vec4 fragmentColor;		// output that goes to the raster memory as told by glBindFragDataLocation
 
-									void main() {
-		fragmentColor = vec4(color, 1); // extend RGB to RGBA
+											void main() {
+		//fragmentColor = vec4(color, 1); // extend RGB to RGBA
+		fragmentColor = vec4(color.x,color.y,color.z, 1); // extend RGB to RGBA
 	}
 )";
-
-public:
 	vec3 color;
+public:
+	
 	//unsigned int programID;
 	
 	//unsigned int vertexShaderID;  // Esetleg ezeket is eltárolni
@@ -116,8 +117,7 @@ public:
 
 	void setColor(vec3 color)
 	{
-		vec3 newColor(color.x, color.y, color.z);
-		color = newColor;
+		this->color = color;
 	}
 	void loadColor()
 	{	
