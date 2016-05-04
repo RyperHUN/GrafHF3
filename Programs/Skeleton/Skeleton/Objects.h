@@ -3,6 +3,8 @@
 #include "Texture.h"
 #include "Material.h"
 #include "RenderState_Light.h"
+#include "Shaders.h"
+#include "Geometry.h"
 
 class Object {
 	Shader *   shader;
@@ -46,7 +48,7 @@ public:
 	{
 		scale = vec3(1, 1, 1);
 		pos = vec3(0, 0, -5);
-		rotAxis = vec3(0, 0, 0);
+		rotAxis = vec3(0, 1, 0);
 		rotAngle = 0;
 	}
 	void Draw(RenderState state) {  //RenderState mi az a renderstate?
@@ -63,6 +65,6 @@ public:
 	}
 	void Animate(float dt) 
 	{
-		
+		rotAngle += 0.0001f;
 	}
 };

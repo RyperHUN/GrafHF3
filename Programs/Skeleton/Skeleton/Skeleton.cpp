@@ -249,7 +249,7 @@ void onInitialization() {
 	ShaderFennyel* shaderFennyel = new ShaderFennyel();
 	shaderFennyel->createShader();
 
-	Material* tesztPiros = new Material(vec3(0.2f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0), 20, true, false);
+	Material* tesztPiros = new Material(vec3(0.2f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0), 10, true, false);
 
 	Sphere* sphereGeometry = new Sphere(vec3(0, 0, -2), 4);
 	GuruloKor* guruloKor = new GuruloKor(shaderFennyel, tesztPiros,nullptr,sphereGeometry);
@@ -330,7 +330,7 @@ void onMouseMotion(int pX, int pY) {
 void onIdle() {
 	long time = glutGet(GLUT_ELAPSED_TIME); // elapsed time since the start of the program
 	float sec = time / 1000.0f;
-
+	scene.Animate(sec); ///TODO ide dt kene
 
 	glutPostRedisplay();					// redraw the scene
 }
