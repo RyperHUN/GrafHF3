@@ -118,9 +118,11 @@ public:
 		float y = r*sin(2 * M_PI*u);
 		float z = (R + r*cos(2 * M_PI*u))*sin(2 * M_PI*v);
 
-		vd.normal = vec3(x*(2 - (2 * R) / sqrtf(x*x + z*z)),
-						2 * y,
-						z*(2 - (2 * R) / sqrtf(x*x + z*z);
+		vd.normal = vec3( 
+							x*(2 - (2 * R) / sqrtf(x*x + z*z)),
+							2 * y,
+							z*(2 - (2 * R) / sqrtf(x*x + z*z)) 
+						);
 		vd.position = vec3(x,y,z);
 		vd.u = u; vd.v = v;
 		return vd;

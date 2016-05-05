@@ -16,9 +16,13 @@ class Object {
 public:
 	Object()
 	{
+	}
+	Object(Shader * shader, Material* material, Texture * texture, Geometry* geometry)
+		:shader(shader), material(material), texture(texture), geometry(geometry)
+	{
 		scale = vec3(1, 1, 1);
-		pos = vec3(0, 0, 0);
-		rotAxis = vec3(0, 0, 0);
+		pos = vec3(0, 0, -5);
+		rotAxis = vec3(0, 1, 0);
 		rotAngle = 0;
 	}
 	virtual void Draw(RenderState state) {  //RenderState mi az a renderstate?
@@ -32,10 +36,12 @@ public:
 		shader->Bind(state);
 		geometry->Draw();
 	}
-	virtual void Animate(float dt) {}
+	virtual void Animate(float dt) 
+	{
+	}
 };
 
-class GuruloKor : public Object {
+class ForgoObjektum : public Object {
 	Shader *   shader;
 	Material * material;
 	Texture *  texture;
@@ -43,12 +49,11 @@ class GuruloKor : public Object {
 	vec3 scale, pos, rotAxis;
 	float rotAngle;
 public:
-	GuruloKor(Shader * shader,Material* material,Texture * texture, Geometry* geometry)
-		:shader(shader),material(material),texture(texture),geometry(geometry)
+	ForgoObjektum(Shader * shader,Material* material,Texture * texture, Geometry* geometry,vec3 rotAxis,vec3 pos)
+		:shader(shader),material(material),texture(texture),geometry(geometry),rotAxis(rotAxis),pos(pos)
 	{
 		scale = vec3(1, 1, 1);
 		pos = vec3(0, 0, -5);
-		rotAxis = vec3(0, 1, 0);
 		rotAngle = 0;
 	}
 	void Draw(RenderState state) {  //RenderState mi az a renderstate?

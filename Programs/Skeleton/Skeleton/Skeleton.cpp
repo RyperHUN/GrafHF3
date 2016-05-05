@@ -252,9 +252,14 @@ void onInitialization() {
 	Material* tesztPiros = new Material(vec3(0.2f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0), 10, true, false);
 
 	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 4);
-	GuruloKor* guruloKor = new GuruloKor(shaderFennyel, tesztPiros,nullptr,sphereGeometry);
+	ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztPiros,nullptr,sphereGeometry, vec3(0,1,0),vec3(0,0,-5));
 
-	scene.AddObject(guruloKor);
+
+	Torus* torusGeometry = new Torus(1, 4);
+	ForgoObjektum* torus = new ForgoObjektum(shaderFennyel, tesztPiros, nullptr, torusGeometry,vec3(1,0,0),vec3(0,0,-5));
+
+	//scene.AddObject(guruloKor);
+	scene.AddObject(torus);
 	
 
 	// Create objects by setting up their vertex data on the GPU
