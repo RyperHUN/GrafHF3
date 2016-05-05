@@ -79,7 +79,7 @@ struct Camera {
 	vec3  wEye, wLookat, wVup; ///Most akkor vec3???
 	float fov, asp, nearPlane, farPlane;
 
-	float wCx, wCy;	// center in world coordinates
+
 	float wWx, wWy;	// width and height in world coordinates
 	bool isFollowing;
 public:
@@ -91,12 +91,8 @@ public:
 		isFollowing = false;
 	}
 
-	//mat4 V() { // view matrix: translates the center to the origin
-	//	return mat4(1, 0, 0, -wCx,
-	//		0, 1, 0, -wCy,
-	//		0, 0, 1, 0,
-	//		0, 0, 0, 1);
-	//}
+	///TODO Kamera poziciojanak X koordinataja forditva mukodik why???
+
 	///TODO inverzét megcsinálni!
 	mat4 V() { // view matrix
 		vec3 w = (wEye - wLookat).normalize();
@@ -108,15 +104,11 @@ public:
 				u.z, v.z, w.z, 0.0f,
 				0.0f, 0.0f, 0.0f, 1.0f);
 	}
+	
 
 
-	//mat4 P() { // projection matrix: scales it to be a square of edge length 2
-	//	return mat4(2 / wWx, 0, 0, 0,
-	//		0, 2 / wWy, 0, 0,
-	//		0, 0, 1, 0,
-	//		0, 0, 0, 1);
-	//}
-	///TODO
+
+	///TODO inverz?!
 	mat4 P() { // projection matrix
 		float sy = 1 / tan(fov / 2);
 		return mat4(sy / asp, 0.0f, 0.0f, 0.0f,
@@ -125,24 +117,9 @@ public:
 			0.0f, 0.0f, -2 * nearPlane*farPlane / (farPlane - nearPlane), 0.0f);
 	}
 
-	mat4 Vinv() { // inverse view matrix
-		return mat4(1, 0, 0, wCx,
-			0, 1, 0, wCy,
-			0, 0, 1, 0,
-			0, 0, 0, 1);
-	}
-
-	mat4 Pinv() { // inverse projection matrix
-		return mat4(wWx / 2, 0, 0, 0,
-			0, wWy / 2, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1);
-	}
-
-	void setCenter(float x = 0, float y = 0)
+	void setCenter(vec3 wEyePos)
 	{
-		wCx = x;
-		wCy = y;
+		wEye = wEyePos;
 	}
 	void increaseScale(float x = 0, float y = 0)
 	{
@@ -150,15 +127,12 @@ public:
 		wWy += y;
 	}
 	void Animate(float t) {
-		wCx = 0; //10 * cosf(t);
-		wCy = 0;
-		wWx = 16;
-		wWy = 16;
+		wEye.y += sinf(t);
 	}
 	void follow(float x, float y)
 	{
-		wCx = x;
-		wCy = y;
+		//wCx = x;
+		//wCy = y;
 	}
 	void loadProjViewMatrixes(int shaderProgram)
 	{
@@ -212,10 +186,13 @@ class Scene {
 public:
 	///TODO megirni hogy inicializaljon mindent
 	Scene()
-		: camera(vec3(0,0,1),vec3(0,0,-1),vec3(0,1,0),90,0.1,10),
-		  light(vec4(1,1,1,1),vec3(0.6f,0.6f,0.6f),vec3(0.6f,0.6f,0.6f)),
+		: camera(vec3(-4,0,-5),vec3(0,0,-1),vec3(0,1,0),90,0.1,10),
+		  light(vec4(-4,0.5,-5.5f,1),vec3(0.6f,0.6f,0.6f),vec3(0.8f,0.8f,0.8f)),
 		  state(light)
 	{
+		//Kivulrol nezeshez, ha belulrol akarod nezni ezt a részt kommentezd ki
+		camera.setCenter(vec3(0, 0, 1));
+		light.wLightPos = vec4(0, 0, 0, 1);
 	}
 	void AddObject(Object* obj)
 	{
@@ -233,6 +210,7 @@ public:
 	void Animate(float dt) {
 		for (Object * obj : objects) 
 			obj->Animate(dt);
+		camera.Animate(dt);
 	}
 	void forgatOnOff()
 	{
@@ -251,17 +229,20 @@ void onInitialization() {
 	shaderSzines->createShader();
 	shaderSzines->setColor(vec3(1, 0, 0));
 
-	ShaderFennyel* shaderFennyel = new ShaderFennyel();
+	ShaderPhong* shaderFennyel = new ShaderPhong();
 	shaderFennyel->createShader();
+
+	ShaderGoraud* shaderGoraud = new ShaderGoraud();
+	shaderGoraud->createShader();
 	
-	Material* tesztPiros = new Material(vec3(0.3f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.5f, 0, 0), 10, true, false);
+	Material* tesztPiros = new Material(vec3(0.2f, 0, 0), vec3(0.2f, 0, 0), vec3(1, 1, 1), 5, true, false);
 
 	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 4);
 	ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztPiros,nullptr,sphereGeometry, vec3(0,1,0),vec3(0,0,-5));
 
 
 	Torus* torusGeometry = new Torus(1, 4);
-	ForgoObjektum* torus = new ForgoObjektum(shaderFennyel, tesztPiros, nullptr, torusGeometry,vec3(1,0,0),vec3(0,0,-5));
+	ForgoObjektum* torus = new ForgoObjektum(shaderGoraud, tesztPiros, nullptr, torusGeometry,vec3(1,0,0),vec3(0,0,-5));
 
 	//scene.AddObject(guruloKor);
 	scene.AddObject(torus);
