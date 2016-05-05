@@ -213,7 +213,7 @@ public:
 	///TODO megirni hogy inicializaljon mindent
 	Scene()
 		: camera(vec3(0,0,1),vec3(0,0,-1),vec3(0,1,0),90,0.1,10),
-		  light(vec4(1,1,0,0),vec3(0.6f,0.6f,0.6f),vec3(0.6f,0.6f,0.6f)),
+		  light(vec4(1,1,1,1),vec3(0.6f,0.6f,0.6f),vec3(0.6f,0.6f,0.6f)),
 		  state(light)
 	{
 	}

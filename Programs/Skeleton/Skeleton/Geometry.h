@@ -40,7 +40,37 @@ public:
 class ParamSurface : public Geometry {
 public:
 	//virtual void Draw() = 0;
-	virtual void Create(int, int) = 0;
+	virtual void Create(int N, int M) {
+		nVtx = N * M * 6;
+		glBindVertexArray(vao);
+		unsigned int vbo;
+		glGenBuffers(1, &vbo); glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+		VertexData *vtxData = new VertexData[nVtx];
+		VertexData *pVtx = vtxData;
+		int k = 0;
+		for (int i = 0; i < N; i++)
+			for (int j = 0; j < M; j++) {
+				pVtx[k++] = GenVertexData((float)i / N, (float)j / M); printf("pos:x: %f, y %f z %f \n", pVtx[k - 1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
+				pVtx[k++] = GenVertexData((float)(i + 1) / N, (float)j / M); printf("pos:x: %f, y %f z %f \n", pVtx[k - 1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
+				pVtx[k++] = GenVertexData((float)i / N, (float)(j + 1) / M); printf("pos:x: %f, y %f z %f \n", pVtx[k - 1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
+				pVtx[k++] = GenVertexData((float)(i + 1) / N, (float)j / M); printf("pos:x: %f, y %f z %f \n", pVtx[k - 1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
+				pVtx[k++] = GenVertexData((float)(i + 1) / N, (float)(j + 1) / M); printf("pos:x: %f, y %f z %f \n", pVtx[k - 1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
+				pVtx[k++] = GenVertexData((float)i / N, (float)(j + 1) / M); printf("pos:x: %f, y %f z %f \n", pVtx[k - 1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
+			}
+
+		int stride = sizeof(VertexData), sVec3 = sizeof(vec3);
+		glBufferData(GL_ARRAY_BUFFER, nVtx * stride, vtxData, GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(0);  // AttribArray 0 = POSITION
+		glEnableVertexAttribArray(1);  // AttribArray 1 = NORMAL
+		glEnableVertexAttribArray(2);  // AttribArray 2 = UV
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)sVec3);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(2 * sVec3));
+		delete[] vtxData; ///Szivargas volt a dian levo kodba enyje benyje
+	}
+	virtual VertexData GenVertexData(float u, float v) = 0;
 	///TODO ez a hierarhiában lehet feljebb is mehet
 	void Draw() {
 		glBindVertexArray(vao);
@@ -54,37 +84,7 @@ class Sphere : public ParamSurface {
 	float radius;
 public:
 	Sphere(vec3 c, float r) : center(c), radius(r) {
-		Create(18, 10); // tessellation level
-	}
-	virtual void Create(int N, int M) {
-		nVtx = N * M * 6;
-		glBindVertexArray(vao);
-		unsigned int vbo;
-		glGenBuffers(1, &vbo); glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-		VertexData *vtxData = new VertexData[nVtx];
-		VertexData *pVtx = vtxData;
-		int k = 0;
-		for (int i = 0; i < N; i++) 
-			for (int j = 0; j < M; j++) {
-				pVtx[k++] = GenVertexData((float)i / N, (float)j / M); printf("pos:x: %f, y %f z %f \n",pVtx[k-1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
-			pVtx[k++] = GenVertexData((float)(i + 1) / N, (float)j / M); printf("pos:x: %f, y %f z %f \n", pVtx[k - 1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
-			pVtx[k++] = GenVertexData((float)i / N, (float)(j + 1) / M); printf("pos:x: %f, y %f z %f \n", pVtx[k - 1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
-			pVtx[k++] = GenVertexData((float)(i + 1) / N, (float)j / M); printf("pos:x: %f, y %f z %f \n", pVtx[k - 1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
-			pVtx[k++] = GenVertexData((float)(i + 1) / N, (float)(j + 1) / M); printf("pos:x: %f, y %f z %f \n", pVtx[k - 1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
-			pVtx[k++] = GenVertexData((float)i / N, (float)(j + 1) / M); printf("pos:x: %f, y %f z %f \n", pVtx[k - 1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
-		}
-
-		int stride = sizeof(VertexData), sVec3 = sizeof(vec3);
-		glBufferData(GL_ARRAY_BUFFER, nVtx * stride, vtxData, GL_STATIC_DRAW);
-
-		glEnableVertexAttribArray(0);  // AttribArray 0 = POSITION
-		glEnableVertexAttribArray(1);  // AttribArray 1 = NORMAL
-		glEnableVertexAttribArray(2);  // AttribArray 2 = UV
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)sVec3);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(2 * sVec3));
-		delete[] vtxData; ///Szivargas volt a dian levo kodba enyje benyje
+		Create(22, 15); // tessellation level
 	}
 
 	VertexData GenVertexData(float u, float v) {
