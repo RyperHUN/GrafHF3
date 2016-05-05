@@ -97,3 +97,32 @@ public:
 		return vd;
 	}
 };
+
+class Torus : public ParamSurface {
+	vec3 center;
+	float radiusTorus;
+	float radiusFromCenter;
+public:
+	Torus(float radiusTorus, float radiusFromCenter) 
+		: radiusTorus(radiusTorus), radiusFromCenter(radiusFromCenter)
+	{
+		Create(22, 15); // tessellation level
+	}
+	//Normal vektor az implicit egyenlet gradiense lesz!
+	VertexData GenVertexData(float u, float v) {
+		VertexData vd;
+		float R = radiusFromCenter;
+		float r = radiusTorus;
+
+		float x = (R + r*cos(2 * M_PI*u))*cos(2 * M_PI*v);
+		float y = r*sin(2 * M_PI*u);
+		float z = (R + r*cos(2 * M_PI*u))*sin(2 * M_PI*v);
+
+		vd.normal = vec3(x*(2 - (2 * R) / sqrtf(x*x + z*z)),
+						2 * y,
+						z*(2 - (2 * R) / sqrtf(x*x + z*z);
+		vd.position = vec3(x,y,z);
+		vd.u = u; vd.v = v;
+		return vd;
+	}
+};
