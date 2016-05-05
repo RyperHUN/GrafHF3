@@ -123,6 +123,8 @@ public:
 							2 * y,
 							z*(2 - (2 * R) / sqrtf(x*x + z*z)) 
 						);
+		//vd.normal = vd.normal* -1.0f;
+
 		vd.position = vec3(x,y,z);
 		vd.u = u; vd.v = v;
 		return vd;

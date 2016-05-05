@@ -234,6 +234,11 @@ public:
 		for (Object * obj : objects) 
 			obj->Animate(dt);
 	}
+	void forgatOnOff()
+	{
+		for (Object * obj : objects)
+			obj->ForgatOnOff();
+	}
 };
 
 Scene scene;
@@ -248,8 +253,8 @@ void onInitialization() {
 
 	ShaderFennyel* shaderFennyel = new ShaderFennyel();
 	shaderFennyel->createShader();
-
-	Material* tesztPiros = new Material(vec3(0.2f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0), 10, true, false);
+	
+	Material* tesztPiros = new Material(vec3(0.3f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.5f, 0, 0), 10, true, false);
 
 	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 4);
 	ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztPiros,nullptr,sphereGeometry, vec3(0,1,0),vec3(0,0,-5));
@@ -304,6 +309,10 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		else
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+	if (key == 'f')
+	{
+		scene.forgatOnOff();
 	}
 		
 }
