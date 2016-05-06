@@ -124,23 +124,24 @@ public:
 			0.0f, 0.0f, -2 * nearPlane*farPlane / (farPlane - nearPlane), 0.0f);
 	}
 
-	mat4 Vinv() { // inverse view matrix
-		return mat4(1, 0, 0, wCx,
-			0, 1, 0, wCy,
-			0, 0, 1, 0,
-			0, 0, 0, 1);
-	}
+	////mat4 Vinv() { // inverse view matrix
+	//	return mat4(1, 0, 0, wCx,
+	//		0, 1, 0, wCy,
+	//		0, 0, 1, 0,
+	//		0, 0, 0, 1);
+	//}
 
-	mat4 Pinv() { // inverse projection matrix
-		return mat4(wWx / 2, 0, 0, 0,
-			0, wWy / 2, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1);
-	}
+	////mat4 Pinv() { // inverse projection matrix
+	//	return mat4(wWx / 2, 0, 0, 0,
+	//		0, wWy / 2, 0, 0,
+	//		0, 0, 1, 0,
+	//		0, 0, 0, 1);
+	//}
 
-	void setCenter(vec3 wEyePos)
+	void setCenter(vec3 wEyePos, vec3 lookAt)
 	{
 		this->wEye = wEyePos;
+		this->wLookat = lookAt;
 	}
 	void increaseScale(float x = 0, float y = 0)
 	{
@@ -207,13 +208,15 @@ class Scene {
 public:
 	///TODO megirni hogy inicializaljon mindent
 	Scene()
-		: camera(vec3(0,0,1),vec3(0,0,-1),vec3(0,1,0),90,0.1,10),
+		: camera(vec3(0,0,2),vec3(0,0,-1),vec3(0,1,0),90,0.1,13),
 		  light(vec4(0,0,0,1),vec3(1,1,1),vec3(1,1,1)),
 		  state(light)
 	{
 		//Torusba ha benne vagy ezt ne kommentezd ki
-		light.wLightPos = vec4(4, 0, -5,1);
-		camera.setCenter(vec3(4, 0, -4.8));
+		light.wLightPos = vec4(-4, 0, -5,1);
+		
+		vec3 campos(-5, 0, 2);
+		camera.setCenter(campos,campos + vec3(0,0,-1) );
 	}
 	void AddObject(Object* obj)
 	{
@@ -254,16 +257,17 @@ void onInitialization() {
 	ShaderFennyel* shaderFennyel = new ShaderFennyel();
 	shaderFennyel->createShader();
 
-	Material* tesztPiros = new Material(vec3(0.2f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0.5f), 10, true, false);
+	Material* tesztPiros = new Material(vec3(0.2f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0.1f), 10, true, false);
+	Material* tesztKek = new Material(vec3(0.1f, 0.1f, 0.4f), vec3(0.1f, 0.1f, 0.5f), vec3(0.1f, 0.1f, 0.4f), 10, true, false);
 
-	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 4);
-	ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztPiros,nullptr,sphereGeometry, vec3(0,1,0),vec3(0,0,-5));
+	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.5f);
+	ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztKek,nullptr,sphereGeometry, vec3(0,1,0),vec3(-5,0,-5.1f));
 
 
 	Torus* torusGeometry = new Torus(1, 4);
 	ForgoObjektum* torus = new ForgoObjektum(shaderFennyel, tesztPiros, nullptr, torusGeometry,vec3(1,0,0),vec3(0,0,-5));
 
-	//scene.AddObject(guruloKor);
+	scene.AddObject(guruloKor);
 	scene.AddObject(torus);
 	
 

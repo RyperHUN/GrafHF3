@@ -55,7 +55,6 @@ public:
 		:shader(shader),material(material),texture(texture),geometry(geometry),rotAxis(rotAxis),pos(pos)
 	{
 		scale = vec3(1, 1, 1);
-		pos = vec3(0, 0, -5);
 		rotAngle = 0;
 	}
 	void Draw(RenderState state) {  //RenderState mi az a renderstate?
