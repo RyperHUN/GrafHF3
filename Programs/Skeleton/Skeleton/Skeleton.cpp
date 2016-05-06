@@ -87,7 +87,6 @@ public:
 		: wEye(wEye),wLookat(wLookat),wVup(wVup),fov(fov),nearPlane(nearPlane),farPlane(farPlane)
 	{
 		asp = 1;
-		Animate(0);
 		isFollowing = false;
 	}
 
@@ -149,10 +148,7 @@ public:
 		wWy += y;
 	}
 	void Animate(float t) {
-		wCx = 0; //10 * cosf(t);
-		wCy = 0;
-		wWx = 16;
-		wWy = 16;
+		//wEye.y +=  0.0001f * sinf(t);
 	}
 	void follow(float x, float y)
 	{
@@ -235,6 +231,8 @@ public:
 	void Animate(float dt) {
 		for (Object * obj : objects) 
 			obj->Animate(dt);
+		camera.Animate(dt);
+		light.Animate(dt);
 	}
 	void forgatOnOff()
 	{
@@ -256,7 +254,7 @@ void onInitialization() {
 	ShaderFennyel* shaderFennyel = new ShaderFennyel();
 	shaderFennyel->createShader();
 
-	Material* tesztPiros = new Material(vec3(0.2f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0), 10, true, false);
+	Material* tesztPiros = new Material(vec3(0.2f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0.5f), 10, true, false);
 
 	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 4);
 	ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztPiros,nullptr,sphereGeometry, vec3(0,1,0),vec3(0,0,-5));
@@ -270,9 +268,6 @@ void onInitialization() {
 	
 
 	// Create objects by setting up their vertex data on the GPU
-	
-
-
 }
 
 

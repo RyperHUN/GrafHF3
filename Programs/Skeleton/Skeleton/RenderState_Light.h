@@ -9,7 +9,10 @@ struct Light {
 		: wLightPos(wLightPos),La(La),Le(Le)
 	{}
 	vec3 La, Le; // Ambiens meg feny intenzitás
-	vec4 wLightPos; //Irany fenyforras ugy lesz ebbol ha 4. koordinata 0	
+	vec4 wLightPos; //Irany fenyforras ugy lesz ebbol ha 4. koordinata 0
+	void Animate(float t) {
+		wLightPos.v[1] += 0.0005f * sinf(t);
+	}
 };
 
 struct RenderState {
