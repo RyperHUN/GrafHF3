@@ -108,7 +108,7 @@ public:
 		///TODO v ami az ut derivaltja
 		// U = time
 		u = u + dt;
-		float v = sin(u);
+		float v = u / 2;
 		VertexData data = toruszGeometry->GenVertexData(u,v);
 
 		return data;
