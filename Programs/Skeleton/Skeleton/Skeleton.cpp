@@ -234,6 +234,11 @@ public:
 		for (Object * obj : objects) 
 			obj->Animate(dt);
 	}
+	void forgatOnOff()
+	{
+		for (Object * obj : objects)
+			obj->forgatOnOff();
+	}
 };
 
 Scene scene;
@@ -305,7 +310,8 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 		else
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
-		
+	if (key == 'f')
+		scene.forgatOnOff();
 }
 
 // Key of ASCII code released
