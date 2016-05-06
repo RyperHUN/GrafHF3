@@ -39,7 +39,6 @@ public:
 	virtual void Animate(float dt) 
 	{
 	}
-	virtual void ForgatOnOff() { }
 };
 
 class ForgoObjektum : public Object {
@@ -49,7 +48,6 @@ class ForgoObjektum : public Object {
 	Geometry * geometry;
 	vec3 scale, pos, rotAxis;
 	float rotAngle;
-	bool forgat = false;
 public:
 	ForgoObjektum(Shader * shader,Material* material,Texture * texture, Geometry* geometry,vec3 rotAxis,vec3 pos)
 		:shader(shader),material(material),texture(texture),geometry(geometry),rotAxis(rotAxis),pos(pos)
@@ -72,11 +70,6 @@ public:
 	}
 	void Animate(float dt) 
 	{
-		if(forgat)
-			rotAngle += 0.0001f;
-	}
-	void ForgatOnOff()
-	{
-		forgat = !forgat;
+		rotAngle += 0.0001f;
 	}
 };
