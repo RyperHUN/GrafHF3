@@ -106,7 +106,7 @@ public:
 		vec3 eloreVektor = pos - elozoPos;
 		eloreVektor = eloreVektor.normalize();
 		rotAxis = cross(eloreVektor, data.normal.normalize());
-		rotAngle -= dt;
+		rotAngle += dt/2.0f;
 	}
 	VertexData getPos(float dt)
 	{

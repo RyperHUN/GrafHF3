@@ -252,9 +252,9 @@ mat4 Rotate(float rotAngle, float xAxis, float yAxis, float zAxis)
 {
 	mat4 rodriguez
 		(
-			cos(rotAngle) + xAxis*xAxis*(1 - cos(rotAngle)), yAxis*zAxis*(1 - cos(rotAngle)) - zAxis*sin(rotAngle), xAxis*zAxis*(1 - cos(rotAngle)) + yAxis*sin(rotAngle), 0,
-			yAxis*xAxis*(1 - cos(rotAngle)) + zAxis*sin(rotAngle), cos(rotAngle) + yAxis*yAxis*(1 - cos(rotAngle)), yAxis*zAxis*(1 - cos(rotAngle)) - xAxis*sin(rotAngle), 0,
-			zAxis*xAxis*(1 - cos(rotAngle)) - yAxis*sin(rotAngle), zAxis*yAxis*(1-cos(rotAngle))+xAxis*sin(rotAngle), cos(rotAngle)+zAxis*zAxis*(1-cos(rotAngle)),0,
+			cos(rotAngle) + xAxis*xAxis*(1 - cos(rotAngle)), yAxis*xAxis*(1 - cos(rotAngle)) + zAxis*sin(rotAngle), zAxis*xAxis*(1 - cos(rotAngle)) - yAxis*sin(rotAngle), 0,
+			xAxis*yAxis*(1 - cos(rotAngle)) - zAxis*sin(rotAngle), cos(rotAngle) + yAxis*yAxis*(1 - cos(rotAngle)), zAxis*yAxis*(1 - cos(rotAngle)) + xAxis*sin(rotAngle), 0,
+			xAxis*zAxis*(1 - cos(rotAngle)) + yAxis*sin(rotAngle), yAxis*zAxis*(1 - cos(rotAngle)) - xAxis*sin(rotAngle), cos(rotAngle)+zAxis*zAxis*(1-cos(rotAngle)),0,
 			0,0,0,1
 		);
 	return rodriguez;
