@@ -98,7 +98,7 @@ public:
 
 			VertexData data = getPos(dt);
 			pos = constPos + data.position;
-			vec3 normalTolas = data.normal * sphereGeometry->getRadius();
+			vec3 normalTolas = data.normal.normalize() * sphereGeometry->getRadius();
 
 			pos = pos + normalTolas;
 			

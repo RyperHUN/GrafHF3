@@ -215,7 +215,7 @@ public:
 
 		//Torusba ha benne vagy ezt ne kommentezd ki
 		vec3 campos(-4, 0, -4);
-		campos = vec3(0, 1, 5);
+		campos = vec3(0, 2, 4);
 
 		vec4 lightPos(campos.x, campos.y, campos.z);
 
@@ -266,12 +266,13 @@ void onInitialization() {
 	Material* tesztPiros = new Material(vec3(0.2f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0.1f), 10, true, false);
 	Material* tesztKek = new Material(vec3(0.1f, 0.1f, 0.4f), vec3(0.1f, 0.1f, 0.5f), vec3(0.1f, 0.1f, 0.4f), 10, true, false);
 
+	vec3 torusCenter = vec3(0, 0, -5);
 	Torus* torusGeometry = new Torus(1, 4);
-	ForgoObjektum* torus = new ForgoObjektum(shaderFennyel, tesztPiros, nullptr, torusGeometry, vec3(1, 0, 0), vec3(0, 0, -5));
+	ForgoObjektum* torus = new ForgoObjektum(shaderFennyel, tesztPiros, nullptr, torusGeometry, vec3(1, 0, 0), torusCenter);
 
-	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.5f);
+	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.7f);
 	//ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztKek,nullptr,sphereGeometry, vec3(0,1,0),vec3(-4,0,-5.3f));
-	ForgoGomb* guruloGomb = new ForgoGomb(shaderFennyel, tesztKek, nullptr, sphereGeometry, vec3(0, 1, 0), vec3(-4, 0, -5.3f),torusGeometry);
+	ForgoGomb* guruloGomb = new ForgoGomb(shaderFennyel, tesztKek, nullptr, sphereGeometry, vec3(0, 1, 0), torusCenter,torusGeometry);
 
 
 	
@@ -350,7 +351,7 @@ void onMouseMotion(int pX, int pY) {
 // Idle event indicating that some time elapsed: do animation here
 void onIdle() {
 	static float tend = 0;
-	const float dt = 0.00001; // dt is ”infinitesimal”
+	const float dt = 0.001f; // dt is ”infinitesimal”
 	float tstart = tend;
 	tend = glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
 
