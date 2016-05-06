@@ -73,7 +73,7 @@ public:
 	void Animate(float dt) 
 	{
 		if(isForgat)
-			rotAngle += 0.0001f;
+			rotAngle += 0.0006f;
 	}
 	void forgatOnOff() 
 	{

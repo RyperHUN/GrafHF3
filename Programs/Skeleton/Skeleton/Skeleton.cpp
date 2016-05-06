@@ -117,7 +117,7 @@ public:
 	//}
 	///TODO
 	mat4 P() { // projection matrix
-		float sy = 1 / tan(fov / 2);
+		float sy = 1 / tan(fov / 2 * M_PI / 180);
 		return mat4(sy / asp, 0.0f, 0.0f, 0.0f,
 			0.0f, sy, 0.0f, 0.0f,
 			0.0f, 0.0f, -(nearPlane + farPlane) / (farPlane - nearPlane), -1.0f,
@@ -212,7 +212,7 @@ public:
 		  state(light)
 	{
 		//Torusba ha benne vagy ezt ne kommentezd ki
-		light.wLightPos = vec4(4, 0, -5);
+		light.wLightPos = vec4(4, 0, -5,1);
 		camera.setCenter(vec3(4, 0, -4.8));
 	}
 	void AddObject(Object* obj)
@@ -336,11 +336,18 @@ void onMouseMotion(int pX, int pY) {
 
 // Idle event indicating that some time elapsed: do animation here
 void onIdle() {
-	long time = glutGet(GLUT_ELAPSED_TIME); // elapsed time since the start of the program
-	float sec = time / 1000.0f;
-	scene.Animate(sec); ///TODO ide dt kene
+	static float tend = 0;
+	const float dt = 0.01; // dt is ”infinitesimal”
+	float tstart = tend;
+	tend = glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
 
-	glutPostRedisplay();					// redraw the scene
+	for (float t = tstart; t < tend; t += dt) {
+		float Dt = min(dt, tend - t);
+		//for (Object * obj : objects) obj->Control(Dt);
+		scene.Animate(dt);
+	}
+	glutPostRedisplay();
+	// redraw the scene
 }
 
 // Idaig modosithatod...
