@@ -212,10 +212,16 @@ public:
 		  light(vec4(0,0,0,1),vec3(1,1,1),vec3(1,1,1)),
 		  state(light)
 	{
+
 		//Torusba ha benne vagy ezt ne kommentezd ki
-		light.wLightPos = vec4(-4, 0, -5,1);
+		vec3 campos(-4, 0, -4);
+		campos = vec3(0, 1, 5);
+
+		vec4 lightPos(campos.x, campos.y, campos.z);
+
+		light.wLightPos = lightPos;
 		
-		vec3 campos(-5, 0, 2);
+		
 		camera.setCenter(campos,campos + vec3(0,0,-1) );
 	}
 	void AddObject(Object* obj)
@@ -260,14 +266,17 @@ void onInitialization() {
 	Material* tesztPiros = new Material(vec3(0.2f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0.1f), 10, true, false);
 	Material* tesztKek = new Material(vec3(0.1f, 0.1f, 0.4f), vec3(0.1f, 0.1f, 0.5f), vec3(0.1f, 0.1f, 0.4f), 10, true, false);
 
-	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.5f);
-	ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztKek,nullptr,sphereGeometry, vec3(0,1,0),vec3(-5,0,-5.1f));
-
-
 	Torus* torusGeometry = new Torus(1, 4);
-	ForgoObjektum* torus = new ForgoObjektum(shaderFennyel, tesztPiros, nullptr, torusGeometry,vec3(1,0,0),vec3(0,0,-5));
+	ForgoObjektum* torus = new ForgoObjektum(shaderFennyel, tesztPiros, nullptr, torusGeometry, vec3(1, 0, 0), vec3(0, 0, -5));
 
-	scene.AddObject(guruloKor);
+	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.5f);
+	//ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztKek,nullptr,sphereGeometry, vec3(0,1,0),vec3(-4,0,-5.3f));
+	ForgoGomb* guruloGomb = new ForgoGomb(shaderFennyel, tesztKek, nullptr, sphereGeometry, vec3(0, 1, 0), vec3(-4, 0, -5.3f),torusGeometry);
+
+
+	
+
+	scene.AddObject(guruloGomb);
 	scene.AddObject(torus);
 	
 
@@ -341,7 +350,7 @@ void onMouseMotion(int pX, int pY) {
 // Idle event indicating that some time elapsed: do animation here
 void onIdle() {
 	static float tend = 0;
-	const float dt = 0.01; // dt is ”infinitesimal”
+	const float dt = 0.00001; // dt is ”infinitesimal”
 	float tstart = tend;
 	tend = glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
 

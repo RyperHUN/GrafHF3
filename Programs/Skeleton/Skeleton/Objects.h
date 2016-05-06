@@ -43,6 +43,7 @@ public:
 };
 
 class ForgoObjektum : public Object {
+protected:
 	Shader *   shader;
 	Material * material;
 	Texture *  texture;
@@ -69,7 +70,7 @@ public:
 		shader->Bind(state);
 		geometry->Draw();
 	}
-	void Animate(float dt) 
+	virtual void Animate(float dt) 
 	{
 		if(isForgat)
 			rotAngle += 0.0006f;
@@ -77,5 +78,39 @@ public:
 	void forgatOnOff() 
 	{
 		isForgat = !isForgat;
+	}
+};
+
+class ForgoGomb : public ForgoObjektum{
+	Torus* toruszGeometry;
+	float u = 0;
+	const vec3 constPos; //Megegyezik a toruszeval! Es ehhez kepes megyunk meg balra jobbra!
+	Sphere* sphereGeometry;
+public:
+	ForgoGomb(Shader * shader, Material* material, Texture * texture, Sphere* geometry, vec3 rotAxis, vec3 pos, Torus* toruszGeometry)
+		: ForgoObjektum(shader, material, texture, geometry, rotAxis, pos),
+		  toruszGeometry(toruszGeometry), constPos(pos), sphereGeometry(geometry)
+	{
+		
+	}
+	void Animate(float dt)
+	{
+
+			VertexData data = getPos(dt);
+			pos = constPos + data.position;
+			vec3 normalTolas = data.normal * sphereGeometry->getRadius();
+
+			pos = pos + normalTolas;
+			
+	}
+	VertexData getPos(float dt)
+	{
+		///TODO v ami az ut derivaltja
+		// U = time
+		u = u + dt;
+		float v = sin(u);
+		VertexData data = toruszGeometry->GenVertexData(u,v);
+
+		return data;
 	}
 };
