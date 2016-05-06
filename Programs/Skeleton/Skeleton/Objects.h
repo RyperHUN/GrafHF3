@@ -95,17 +95,23 @@ public:
 	}
 	void Animate(float dt)
 	{
+		vec3 elozoPos = pos;
+		VertexData data = getPos(dt);
+		pos = constPos + data.position;
+		vec3 normalTolas = data.normal.normalize() * sphereGeometry->getRadius();
 
-			VertexData data = getPos(dt);
-			pos = constPos + data.position;
-			vec3 normalTolas = data.normal.normalize() * sphereGeometry->getRadius();
-
-			pos = pos + normalTolas;
-			
+		pos = pos + normalTolas;
+		
+		//Forgatas
+		vec3 eloreVektor = pos - elozoPos;
+		eloreVektor = eloreVektor.normalize();
+		rotAxis = cross(eloreVektor, data.normal.normalize());
+		rotAngle -= dt;
 	}
 	VertexData getPos(float dt)
 	{
 		///TODO v ami az ut derivaltja
+		dt = dt / 3.0f;
 		// U = time
 		u = u + dt;
 		float v = u / 2;

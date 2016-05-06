@@ -215,7 +215,7 @@ public:
 
 		//Torusba ha benne vagy ezt ne kommentezd ki
 		vec3 campos(-4, 0, -4);
-		campos = vec3(0, 2, 4);
+		//campos = vec3(0, 2, 4);
 
 		vec4 lightPos(campos.x, campos.y, campos.z);
 
@@ -270,7 +270,7 @@ void onInitialization() {
 	Torus* torusGeometry = new Torus(1, 4);
 	ForgoObjektum* torus = new ForgoObjektum(shaderFennyel, tesztPiros, nullptr, torusGeometry, vec3(1, 0, 0), torusCenter);
 
-	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.7f);
+	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.4f);
 	//ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztKek,nullptr,sphereGeometry, vec3(0,1,0),vec3(-4,0,-5.3f));
 	ForgoGomb* guruloGomb = new ForgoGomb(shaderFennyel, tesztKek, nullptr, sphereGeometry, vec3(0, 1, 0), torusCenter,torusGeometry);
 
