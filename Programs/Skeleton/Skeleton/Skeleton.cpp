@@ -139,10 +139,9 @@ public:
 			0, 0, 0, 1);
 	}
 
-	void setCenter(float x = 0, float y = 0)
+	void setCenter(vec3 wEyePos)
 	{
-		wCx = x;
-		wCy = y;
+		this->wEye = wEyePos;
 	}
 	void increaseScale(float x = 0, float y = 0)
 	{
@@ -213,9 +212,12 @@ public:
 	///TODO megirni hogy inicializaljon mindent
 	Scene()
 		: camera(vec3(0,0,1),vec3(0,0,-1),vec3(0,1,0),90,0.1,10),
-		  light(vec4(1,1,1,1),vec3(0.6f,0.6f,0.6f),vec3(0.6f,0.6f,0.6f)),
+		  light(vec4(0,0,0,1),vec3(1,1,1),vec3(1,1,1)),
 		  state(light)
 	{
+		//Torusba ha benne vagy ezt ne kommentezd ki
+		light.wLightPos = vec4(4, 0, -5);
+		camera.setCenter(vec3(4, 0, -4.8));
 	}
 	void AddObject(Object* obj)
 	{
