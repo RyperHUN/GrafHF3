@@ -81,7 +81,7 @@ struct Camera {
 
 	float wCx, wCy;	// center in world coordinates
 	float wWx, wWy;	// width and height in world coordinates
-	bool isFollowing;
+	static bool isFollowing;
 public:
 	Camera(vec3 wEye,vec3 wLookat,vec3 wVup,float fov,float nearPlane,float farPlane) 
 		: wEye(wEye),wLookat(wLookat),wVup(wVup),fov(fov),nearPlane(nearPlane),farPlane(farPlane)
@@ -151,10 +151,14 @@ public:
 	void Animate(float t) {
 		//wEye.y +=  0.0001f * sinf(t);
 	}
-	void follow(float x, float y)
+	void follow(vec3 SpherePos)
 	{
-		wCx = x;
-		wCy = y;
+		if (isFollowing)
+		{
+			this->wLookat.x = SpherePos.x;
+			this->wLookat.z = SpherePos.z;
+		}
+
 	}
 	void loadProjViewMatrixes(int shaderProgram)
 	{
@@ -175,18 +179,12 @@ public:
 		else
 			glUniformMatrix4fv(location, 1, GL_TRUE, V());
 	}
-	void toggleFollow()
+	static void toggleFollow()
 	{
-		if (isFollowing)
-		{
-			isFollowing = false;
-			Animate(0);
-		}
-		else
-			isFollowing = true;
+		isFollowing = !isFollowing;
 	}
 };
-
+bool Camera::isFollowing = false;
 //2D camera
 
 
@@ -205,7 +203,9 @@ class Scene {
 	vector<Object *> objects;
 	Light light;
 	RenderState state;
+	
 public:
+	vec3 *SpherePos;
 	///TODO megirni hogy inicializaljon mindent
 	Scene()
 		: camera(vec3(0,0,2),vec3(0,0,-1),vec3(0,1,0),90,0.1,13),
@@ -241,6 +241,7 @@ public:
 		for (Object * obj : objects) 
 			obj->Animate(dt);
 		camera.Animate(dt);
+		camera.follow(*SpherePos);
 		light.Animate(dt);
 	}
 	void forgatOnOff()
@@ -274,7 +275,7 @@ void onInitialization() {
 	//ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztKek,nullptr,sphereGeometry, vec3(0,1,0),vec3(-4,0,-5.3f));
 	ForgoGomb* guruloGomb = new ForgoGomb(shaderFennyel, tesztKek, nullptr, sphereGeometry, vec3(0, 1, 0), torusCenter,torusGeometry);
 
-
+	scene.SpherePos = guruloGomb->getPos();
 	
 
 	scene.AddObject(guruloGomb);
@@ -323,6 +324,8 @@ void onKeyboard(unsigned char key, int pX, int pY) {
 	}
 	if (key == 'f')
 		scene.forgatOnOff();
+	if (key == ' ')
+		Camera::toggleFollow();
 }
 
 // Key of ASCII code released

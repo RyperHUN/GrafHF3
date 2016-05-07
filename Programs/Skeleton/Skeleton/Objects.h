@@ -93,10 +93,11 @@ public:
 	{
 		
 	}
+	vec3* getPos() { return &pos; }
 	void Animate(float dt)
 	{
 		vec3 elozoPos = pos;
-		VertexData data = getPos(dt);
+		VertexData data = getPosOnTorus(dt);
 		pos = constPos + data.position;
 		vec3 normalTolas = data.normal.normalize() * sphereGeometry->getRadius();
 
@@ -108,14 +109,15 @@ public:
 		rotAxis = cross(eloreVektor, data.normal.normalize());
 		rotAngle += dt/2.0f;
 	}
-	VertexData getPos(float dt)
+private:
+	VertexData getPosOnTorus(float dt)
 	{
 		///TODO v ami az ut derivaltja
 		dt = dt / 3.0f;
 		// U = time
 		u = u + dt;
 		float v = u / 2;
-		VertexData data = toruszGeometry->GenVertexData(u,v);
+		VertexData data = toruszGeometry->GenVertexData(u, v);
 
 		return data;
 	}
