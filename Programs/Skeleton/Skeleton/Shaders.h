@@ -145,13 +145,13 @@ public:
 		state.Minv.SetUniform(shaderProgram, "Minv");
 		state.M.SetUniform(shaderProgram, "M");
 
-		vec3 wEye = state.wEye;
-		int location = getUniform("wEye");
-		glUniform3f(location, wEye.x, wEye.y, wEye.z);
-
 		Light light = state.light;
-		location = getUniform("wLiPos");
+		int location = getUniform("wLiPos");
 		glUniform4f(location, light.wLightPos.v[0], light.wLightPos.v[1], light.wLightPos.v[2], light.wLightPos.v[3]);
+
+		vec3 wEye = state.wEye;
+		location = getUniform("wEye");
+		glUniform3f(location, wEye.x, wEye.y, wEye.z);
 		//====================== VERTEX SHADER BETOLTVE ================================//
 		
 		//====================== FRAGMENT SHADER TOLTES ================================//
@@ -172,7 +172,7 @@ public:
 		glUniform3f(location, light.La.x, light.La.y, light.La.z);
 		location = getUniform("Le");
 		glUniform3f(location, light.Le.x, light.Le.y, light.Le.z);
-
+		//====================== FRAGMENT SHADER KESZ ================================//
 	}
 };
 class ShaderSzines : public Shader
@@ -285,3 +285,178 @@ public:
 		loadColor();
 	}
 };
+
+class ShaderTexture : public Shader
+{
+	const char *vertexSource = R"(
+	#version 130
+    	precision highp float;
+	uniform mat4  MVP, M, Minv; // MVP, Model, Model-inverse
+	uniform vec4  wLiPos;       // pos of light source 
+	uniform vec3  wEye;         // pos of eye
+
+	in  vec3 vtxPos;            // pos in modeling space
+	in  vec3 vtxNorm;           // normal in modeling space
+	in  vec2 uv;           // Miert nincs ez hasznalva?
+
+							out vec3 wNormal;           // normal in world space
+	out vec3 wView;             // view in world space
+	out vec3 wLight;            // light dir in world space
+	out vec2 texcoord;
+
+					
+	void main() {
+	   gl_Position = vec4(vtxPos, 1) * MVP; // to NDC
+	   texcoord = uv;
+
+			   vec4 wPos = vec4(vtxPos, 1) * M;
+	   wLight  = wLiPos.xyz * wPos.w - wPos.xyz * wLiPos.w;
+	   wView   = wEye * wPos.w - wPos.xyz;
+	   wNormal = (Minv * vec4(vtxNorm, 0)).xyz;
+	}
+)";
+
+	// fragment shader in GLSL
+	const char *fragmentSource = R"(
+	#version 130
+    	precision highp float;
+	uniform sampler2D samplerUnit;
+
+			uniform vec3 kd, ks, ka;// diffuse, specular, ambient ref
+	uniform vec3 La, Le;    // ambient and point source rad
+	uniform float shine;    // shininess for specular ref
+
+							in  vec3 wNormal;       // interpolated world sp normal
+	in  vec3 wView;         // interpolated world sp view
+	in  vec3 wLight;        // interpolated world sp illum dir
+	in vec2 texcoord;
+	out vec4 fragmentColor; // output goes to frame buffer
+
+					void main() {
+	   vec3 N = normalize(wNormal);
+	   vec3 V = normalize(wView);  
+	   vec3 L = normalize(wLight);
+	   vec3 H = normalize(L + V);
+	   float cost = max(dot(N,L), 0), cosd = max(dot(N,H), 0);
+	   vec3 color = ka * La + 
+				   (kd * cost + ks * pow(cosd,shine)) * Le;
+	    fragmentColor = vec4(color, 1);
+		fragmentColor = texture(samplerUnit,texcoord);
+	}
+
+		)";
+	vec3 color;
+public:
+
+	//unsigned int programID;
+
+	//unsigned int vertexShaderID;  // Esetleg ezeket is eltárolni
+	//unsigned int fragmentShaderID;
+	// vertex shader in GLSL
+	ShaderTexture()
+	{
+	}
+
+	void createShader()
+	{
+		unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+		if (!vertexShader) {
+			printf("Error in vertex shader creation\n");
+			exit(1);
+		}
+		glShaderSource(vertexShader, 1, &vertexSource, NULL);
+		glCompileShader(vertexShader);
+		checkShader(vertexShader, "Vertex shader error");
+
+		// Create fragment shader from string
+		unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+		if (!fragmentShader) {
+			printf("Error in fragment shader creation\n");
+			exit(1);
+		}
+		glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
+		glCompileShader(fragmentShader);
+		checkShader(fragmentShader, "Fragment shader error");
+
+		// Attach shaders to a single program
+		shaderProgram = glCreateProgram();
+		if (!shaderProgram) {
+			printf("Error in shader program creation\n");
+			exit(1);
+		}
+		glAttachShader(shaderProgram, vertexShader);
+		glAttachShader(shaderProgram, fragmentShader);
+
+		bindAttributes();
+
+		// program packaging
+		glLinkProgram(shaderProgram);
+		checkLinking(shaderProgram);
+		// make this program run
+		glUseProgram(shaderProgram);
+
+		//Toroljuk a shadereket - Mar hozzaadtuk a programhoz szoval mar nem kell
+		glDeleteShader(vertexShader);
+		glDeleteShader(fragmentShader);
+	}
+	void bindAttributes()
+	{
+		// Connect Attrib Arrays to input variables of the vertex shader
+		glBindAttribLocation(shaderProgram, 0, "vtxPos"); // vertexPosition gets values from Attrib Array 0
+		glBindAttribLocation(shaderProgram, 1, "vtxNormal"); // vertexPosition gets values from Attrib Array 0
+		glBindAttribLocation(shaderProgram, 2, "uv"); // vertexPosition gets values from Attrib Array 0
+		glBindFragDataLocation(shaderProgram, 0, "fragmentColor");	// fragmentColor goes to the frame buffer memory
+	}
+	void Bind(RenderState& state) {
+		//====================== VERTEX SHADER TOLTES ================================//
+		glUseProgram(shaderProgram);
+		mat4 MVP = state.M * state.V * state.P;
+		MVP.SetUniform(shaderProgram, "MVP");
+		state.Minv.SetUniform(shaderProgram, "Minv");
+		state.M.SetUniform(shaderProgram, "M");
+
+		vec3 wEye = state.wEye;
+		int location = getUniform("wEye");
+		glUniform3f(location, wEye.x, wEye.y, wEye.z);
+
+		Light light = state.light;
+		location = getUniform("wLiPos");
+		glUniform4f(location, light.wLightPos.v[0], light.wLightPos.v[1], light.wLightPos.v[2], light.wLightPos.v[3]);
+		//====================== VERTEX SHADER BETOLTVE ================================//
+
+		//====================== FRAGMENT SHADER TOLTES ================================//
+		location = getUniform("kd");
+		vec3 kd = state.material->kd;
+		glUniform3f(location, kd.x, kd.y, kd.z);
+
+		location = getUniform("ks");
+		vec3 ks = state.material->ks;
+		glUniform3f(location, ks.x, ks.y, ks.z);
+
+		location = getUniform("ka");
+		vec3 ka = state.material->ka;
+		glUniform3f(location, ka.x, ka.y, ka.z);
+
+		//Feny
+		location = getUniform("La");
+		glUniform3f(location, light.La.x, light.La.y, light.La.z);
+		location = getUniform("Le");
+		glUniform3f(location, light.Le.x, light.Le.y, light.Le.z);
+
+		if (state.texture != nullptr)
+		{
+			int samplerUnit = GL_TEXTURE0; // GL_TEXTURE1, …
+			int location = getUniform("samplerUnit");
+			glUniform1i(location, samplerUnit);
+			glActiveTexture(samplerUnit);
+			glBindTexture(GL_TEXTURE_2D, state.texture->textureId);
+		}
+		
+	}
+};
+//TODO texturazva rajzol
+//void Geometry::Draw() {
+
+
+//	glBindVertexArray(vao); glDrawArrays(GL_TRIANGLES, 0, nVtx);
+//}

@@ -58,7 +58,7 @@ public:
 		scale = vec3(1, 1, 1);
 		rotAngle = 0;
 	}
-	void Draw(RenderState state) {  //RenderState mi az a renderstate?
+	virtual void Draw(RenderState state) {  //RenderState mi az a renderstate?
 		mat4 Mscale = Scale(scale.x, scale.y, scale.z);
 		mat4 Mrotate = Rotate(rotAngle, rotAxis.x, rotAxis.y, rotAxis.z);
 		mat4 Mtranslate = Translate(pos.x, pos.y, pos.z);
@@ -86,6 +86,8 @@ class ForgoGomb : public ForgoObjektum{
 	float u = 0;
 	const vec3 constPos; //Megegyezik a toruszeval! Es ehhez kepes megyunk meg balra jobbra!
 	Sphere* sphereGeometry;
+	mat4 rotateMatrix;
+	mat4 rotateMatrixInverse;
 public:
 	ForgoGomb(Shader * shader, Material* material, Texture * texture, Sphere* geometry, vec3 rotAxis, vec3 pos, Torus* toruszGeometry)
 		: ForgoObjektum(shader, material, texture, geometry, rotAxis, pos),
@@ -107,8 +109,26 @@ public:
 		vec3 eloreVektor = pos - elozoPos;
 		eloreVektor = eloreVektor.normalize();
 		rotAxis = cross(eloreVektor, data.normal.normalize());
-		rotAngle += dt/2.0f;
+		rotAxis = rotAxis.normalize();
+		rotAngle = dt*2.0f;
+
+		rotateMatrix = rotateMatrix* Rotate(rotAngle, rotAxis.x, rotAxis.y, rotAxis.z);
+		rotateMatrixInverse = rotateMatrixInverse* Rotate(-rotAngle, rotAxis.x, rotAxis.y, rotAxis.z);
 	}
+	///TODO kommentezd ki ha normális forgatást akarsz
+	//void Draw(RenderState state) {  //RenderState mi az a renderstate?
+	//	mat4 Mscale = Scale(scale.x, scale.y, scale.z);
+	//	mat4 Mrotate = rotateMatrix;
+	//	mat4 Mtranslate = Translate(pos.x, pos.y, pos.z);
+	//	mat4 MrotateInverse = rotateMatrixInverse;
+	//	state.M = Mscale*Mrotate*Mtranslate;
+	//	state.Minv = Translate(-pos.x, -pos.y, -pos.z) *
+	//		MrotateInverse *
+	//		Scale(1 / scale.x, 1 / scale.y, 1 / scale.z);
+	//	state.material = material; state.texture = texture;
+	//	shader->Bind(state);
+	//	geometry->Draw();
+	//}
 private:
 	VertexData getPosOnTorus(float dt)
 	{

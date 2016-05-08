@@ -90,13 +90,6 @@ public:
 		isFollowing = false;
 	}
 
-	//mat4 V() { // view matrix: translates the center to the origin
-	//	return mat4(1, 0, 0, -wCx,
-	//		0, 1, 0, -wCy,
-	//		0, 0, 1, 0,
-	//		0, 0, 0, 1);
-	//}
-	///TODO inverzét megcsinálni!
 	mat4 V() { // view matrix
 		vec3 w = (wEye - wLookat).normalize();
 		vec3 u = cross(wVup, w).normalize();
@@ -107,36 +100,38 @@ public:
 				u.z, v.z, w.z, 0.0f,
 				0.0f, 0.0f, 0.0f, 1.0f);
 	}
-
-
-	//mat4 P() { // projection matrix: scales it to be a square of edge length 2
-	//	return mat4(2 / wWx, 0, 0, 0,
-	//		0, 2 / wWy, 0, 0,
-	//		0, 0, 1, 0,
-	//		0, 0, 0, 1);
-	//}
-	///TODO
+	//A szemet a masik iranyba kell eltolni, mivel a matrix ortogonalis, ezert a
+	//forgatasnal csak transzponálni kell az eredetit!
+	mat4 Vinv()
+	{
+		vec3 w = (wEye - wLookat).normalize();
+		vec3 u = cross(wVup, w).normalize();
+		vec3 v = cross(w, u);
+		return Translate(wEye.x, wEye.y, wEye.z) *
+			mat4(u.x, u.y, u.z, 0.0f,
+				v.x, v.y, v.z, 0.0f,
+				w.x, w.y, w.z, 0.0f,
+				0.0f, 0.0f, 0.0f, 1.0f);
+	}
 	mat4 P() { // projection matrix
 		float sy = 1 / tan(fov / 2 * M_PI / 180);
+		float alfa = -(nearPlane + farPlane) / (farPlane - nearPlane);
+		float beta = -2 * nearPlane*farPlane / (farPlane - nearPlane);
 		return mat4(sy / asp, 0.0f, 0.0f, 0.0f,
 			0.0f, sy, 0.0f, 0.0f,
-			0.0f, 0.0f, -(nearPlane + farPlane) / (farPlane - nearPlane), -1.0f,
-			0.0f, 0.0f, -2 * nearPlane*farPlane / (farPlane - nearPlane), 0.0f);
+			0.0f, 0.0f, alfa, -1.0f,
+			0.0f, 0.0f, beta, 0.0f);
 	}
-
-	////mat4 Vinv() { // inverse view matrix
-	//	return mat4(1, 0, 0, wCx,
-	//		0, 1, 0, wCy,
-	//		0, 0, 1, 0,
-	//		0, 0, 0, 1);
-	//}
-
-	////mat4 Pinv() { // inverse projection matrix
-	//	return mat4(wWx / 2, 0, 0, 0,
-	//		0, wWy / 2, 0, 0,
-	//		0, 0, 1, 0,
-	//		0, 0, 0, 1);
-	//}
+	//Invertalva gauss eliminacioval!
+	mat4 Pinv() { // inverse projection matrix
+		float sy = 1 / tan(fov / 2 * M_PI / 180);
+		float alfa = -(nearPlane + farPlane) / (farPlane - nearPlane);
+		float beta = -2 * nearPlane*farPlane / (farPlane - nearPlane);
+		return mat4(1 /(sy / asp), 0.0f, 0.0f, 0.0f,
+			0.0f, 1/ sy, 0.0f, 0.0f,
+			0.0f, 0.0f, 0, 1/beta,
+			0.0f, 0.0f, -1, alfa/beta);
+	}
 
 	void setCenter(vec3 wEyePos, vec3 lookAt)
 	{
@@ -212,7 +207,6 @@ public:
 		  light(vec4(0,0,0,1),vec3(1,1,1),vec3(1,1,1)),
 		  state(light)
 	{
-
 		//Torusba ha benne vagy ezt ne kommentezd ki
 		vec3 campos(-4, 0, -4);
 		//campos = vec3(0, 2, 4);
@@ -257,6 +251,11 @@ Scene scene;
 void onInitialization() {
 	glViewport(0, 0, windowWidth, windowHeight);
 	glEnable(GL_DEPTH_TEST);
+
+	Texture * tesztTexture = new Texture();
+	ShaderTexture* shaderTexture = new ShaderTexture();
+	shaderTexture->createShader();
+
 	ShaderSzines* shaderSzines = new ShaderSzines();
 	shaderSzines->createShader();
 	shaderSzines->setColor(vec3(1, 0, 0));
@@ -269,7 +268,7 @@ void onInitialization() {
 
 	vec3 torusCenter = vec3(0, 0, -5);
 	Torus* torusGeometry = new Torus(1, 4);
-	ForgoObjektum* torus = new ForgoObjektum(shaderFennyel, tesztPiros, nullptr, torusGeometry, vec3(1, 0, 0), torusCenter);
+	ForgoObjektum* torus = new ForgoObjektum(shaderFennyel, tesztPiros, tesztTexture, torusGeometry, vec3(1, 0, 0), torusCenter);
 
 	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.4f);
 	//ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztKek,nullptr,sphereGeometry, vec3(0,1,0),vec3(-4,0,-5.3f));

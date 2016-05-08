@@ -17,17 +17,6 @@ public:
 	}
 
 	virtual void Draw() = 0;
-	//TODO texturazva rajzol
-	//void Geometry::Draw() {
-	//	int samplerUnit = GL_TEXTURE0; // GL_TEXTURE1, …
-	//	int location = glGetUniformLocation(shaderProg, "samplerUnit");
-	//	glUniform1i(location, samplerUnit);
-	//	glActiveTexture(samplerUnit);
-	//	glBindTexture(GL_TEXTURE_2D, texture.textureId);
-
-	//	glBindVertexArray(vao); glDrawArrays(GL_TRIANGLES, 0, nVtx);
-	//}
-
 };
 
 class PolygonMesh : public Geometry {

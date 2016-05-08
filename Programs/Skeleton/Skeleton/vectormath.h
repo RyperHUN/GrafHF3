@@ -111,7 +111,7 @@ public:
 		//Valamiért kell egy minusz különben az óramutatóval ellentétesen forgat
 		float radian = -szogFok / 180 * M_PI;
 		m[0][0] = cosf(radian);
-		m[1][0] = sinf(radian);  ///TODO itt talan a ketto kozepsot megcserelni
+		m[1][0] = sinf(radian);  
 		m[0][1] = -sinf(radian);
 		m[1][1] = cosf(radian);
 	}
