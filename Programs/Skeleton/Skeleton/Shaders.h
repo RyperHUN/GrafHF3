@@ -286,7 +286,7 @@ public:
 	}
 };
 
-class ShaderTexture : public Shader
+class ShaderTextureTorus : public Shader
 {
 	const char *vertexSource = R"(
 	#version 130
@@ -303,7 +303,6 @@ class ShaderTexture : public Shader
 	out vec3 wView;             // view in world space
 	out vec3 wLight;            // light dir in world space
 	out vec2 texcoord;
-
 					
 	void main() {
 	   gl_Position = vec4(vtxPos, 1) * MVP; // to NDC
@@ -320,19 +319,41 @@ class ShaderTexture : public Shader
 	const char *fragmentSource = R"(
 	#version 130
     	precision highp float;
-	uniform sampler2D samplerUnit;
 
-			uniform vec3 kd, ks, ka;// diffuse, specular, ambient ref
+					vec3 get_Texture(vec2 current_tex_coord)
+	{
+			vec2 value = vec2(
+				mod(current_tex_coord.x, 0.2),
+				mod(current_tex_coord.y, 0.2)
+				);
+			vec3 temp_color;
+				if(value.x > 0.1)
+					temp_color.x = 1;
+				else
+					temp_color.x = 0.5;
+   
+				if(value.y > 0.1)
+					temp_color.z = 1;
+				else
+					temp_color.z = 0.5;
+       
+			temp_color.y = 0;
+				return temp_color;
+	}
+
+							uniform sampler2D samplerUnit;
+
+											uniform vec3 kd, ks, ka;// diffuse, specular, ambient ref
 	uniform vec3 La, Le;    // ambient and point source rad
 	uniform float shine;    // shininess for specular ref
 
-							in  vec3 wNormal;       // interpolated world sp normal
+															in  vec3 wNormal;       // interpolated world sp normal
 	in  vec3 wView;         // interpolated world sp view
 	in  vec3 wLight;        // interpolated world sp illum dir
 	in vec2 texcoord;
 	out vec4 fragmentColor; // output goes to frame buffer
 
-					void main() {
+													void main() {
 	   vec3 N = normalize(wNormal);
 	   vec3 V = normalize(wView);  
 	   vec3 L = normalize(wLight);
@@ -340,9 +361,15 @@ class ShaderTexture : public Shader
 	   float cost = max(dot(N,L), 0), cosd = max(dot(N,H), 0);
 	   vec3 color = ka * La + 
 				   (kd * cost + ks * pow(cosd,shine)) * Le;
-	    fragmentColor = vec4(color, 1);
-		fragmentColor = texture(samplerUnit,texcoord);
+
+				color = get_Texture(texcoord);
+	    color = ka * La + (color * pow(cosd,shine))*Le;
+			    fragmentColor = vec4(color, 1);
+		//fragmentColor = texture(samplerUnit,texcoord);
 	}
+
+	
+			
 
 		)";
 	vec3 color;
@@ -353,7 +380,7 @@ public:
 	//unsigned int vertexShaderID;  // Esetleg ezeket is eltárolni
 	//unsigned int fragmentShaderID;
 	// vertex shader in GLSL
-	ShaderTexture()
+	ShaderTextureTorus()
 	{
 	}
 
@@ -443,14 +470,14 @@ public:
 		location = getUniform("Le");
 		glUniform3f(location, light.Le.x, light.Le.y, light.Le.z);
 
-		if (state.texture != nullptr)
-		{
-			int samplerUnit = GL_TEXTURE0; // GL_TEXTURE1, …
-			int location = getUniform("samplerUnit");
-			glUniform1i(location, samplerUnit);
-			glActiveTexture(samplerUnit);
-			glBindTexture(GL_TEXTURE_2D, state.texture->textureId);
-		}
+		//if (state.texture != nullptr)
+		//{
+		//	int samplerUnit = GL_TEXTURE0; // GL_TEXTURE1, …
+		//	int location = getUniform("samplerUnit");
+		//	glUniform1i(location, samplerUnit);
+		//	glActiveTexture(samplerUnit);
+		//	glBindTexture(GL_TEXTURE_2D, state.texture->textureId);
+		//}
 		
 	}
 };

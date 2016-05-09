@@ -253,7 +253,7 @@ void onInitialization() {
 	glEnable(GL_DEPTH_TEST);
 
 	Texture * tesztTexture = new Texture();
-	ShaderTexture* shaderTexture = new ShaderTexture();
+	ShaderTextureTorus* shaderTexture = new ShaderTextureTorus();
 	shaderTexture->createShader();
 
 	ShaderSzines* shaderSzines = new ShaderSzines();
@@ -268,7 +268,7 @@ void onInitialization() {
 
 	vec3 torusCenter = vec3(0, 0, -5);
 	Torus* torusGeometry = new Torus(1, 4);
-	ForgoObjektum* torus = new ForgoObjektum(shaderFennyel, tesztPiros, tesztTexture, torusGeometry, vec3(1, 0, 0), torusCenter);
+	ForgoObjektum* torus = new ForgoObjektum(shaderTexture, tesztPiros, nullptr, torusGeometry, vec3(1, 0, 0), torusCenter);
 
 	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.4f);
 	//ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztKek,nullptr,sphereGeometry, vec3(0,1,0),vec3(-4,0,-5.3f));
