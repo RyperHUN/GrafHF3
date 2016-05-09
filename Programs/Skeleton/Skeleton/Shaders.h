@@ -54,6 +54,9 @@ class ShaderFennyel : public Shader
 	const char *fragmentSource = R"(
 	#version 130
     	precision highp float;
+
+
+
 	uniform vec3 kd, ks, ka;// diffuse, specular, ambient ref
 	uniform vec3 La, Le;    // ambient and point source rad
 	uniform float shine;    // shininess for specular ref
@@ -63,14 +66,23 @@ class ShaderFennyel : public Shader
 	in  vec3 wLight;        // interpolated world sp illum dir
 	out vec4 fragmentColor; // output goes to frame buffer
 
-	void main() {
-	   vec3 N = normalize(wNormal);
+vec3 getColor()
+{
+	vec3 N = normalize(wNormal);
 	   vec3 V = normalize(wView);  
 	   vec3 L = normalize(wLight);
 	   vec3 H = normalize(L + V);
-	   float cost = max(dot(N,L), 0), cosd = max(dot(N,H), 0);
+	   float cost = max(dot(N,L), 0);
+	   float cosd = max(dot(N,H), 0);
+	   
 	   vec3 color = ka * La + 
 				   (kd * cost + ks * pow(cosd,shine)) * Le;
+				   
+	   return color;
+}
+
+	void main() {
+	   vec3 color = getColor();
 	   fragmentColor = vec4(color, 1);
 	}
 
@@ -481,9 +493,3 @@ public:
 		
 	}
 };
-//TODO texturazva rajzol
-//void Geometry::Draw() {
-
-
-//	glBindVertexArray(vao); glDrawArrays(GL_TRIANGLES, 0, nVtx);
-//}
