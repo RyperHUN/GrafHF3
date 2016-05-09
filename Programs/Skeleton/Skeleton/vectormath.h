@@ -106,6 +106,18 @@ public:
 		m[1][1] = y;
 		m[2][2] = z;
 	}
+	mat4 Transpose()
+	{
+		mat4 temp = *this;
+		for (int i = 0; i < 4; i++)
+		{
+			for (int j = 0; j < 4; j++)
+			{
+				temp.m[j][i] = m[i][j];
+			}
+		}
+		return temp;
+	}
 	void forgatZ(float szogFok)
 	{
 		//Valamiért kell egy minusz különben az óramutatóval ellentétesen forgat
