@@ -84,6 +84,7 @@ public:
 class ForgoGomb : public ForgoObjektum{
 	Torus* toruszGeometry;
 	float u = 0;
+	float v = 0;
 	const vec3 constPos; //Megegyezik a toruszeval! Es ehhez kepes megyunk meg balra jobbra!
 	Sphere* sphereGeometry;
 	mat4 rotateMatrix;
@@ -97,15 +98,15 @@ public:
 	vec3* getPos() { return &pos; }
 	void Animate(float dt)
 	{
-		vec3 elozoPos = pos;
-		VertexData data = getPosOnTorus(dt);
+		vec3 sebesseg(1, 1, 1);
+		VertexData data = getPosOnTorus(dt,sebesseg);
 		pos = constPos + data.position;
 		vec3 normalTolas = data.normal.normalize() * sphereGeometry->getRadius();
 
 		pos = pos + normalTolas;
 		
 		//Forgatas
-		vec3 eloreVektor = pos - elozoPos;
+		vec3 eloreVektor = sebesseg;
 		eloreVektor = eloreVektor.normalize();
 		rotAxis = cross(eloreVektor, data.normal.normalize());
 		rotAxis = rotAxis.normalize();
@@ -128,14 +129,20 @@ public:
 		geometry->Draw();
 	}
 private:
-	VertexData getPosOnTorus(float dt)
+	VertexData getPosOnTorus(float dt, vec3 &sebesseg)
 	{
 		///TODO v ami az ut derivaltja
-		dt = dt / 3.0f;
+		dt = dt / 3.0f; // => a = 1/3 mivel deriváltja ennyi
+		float dudt = 1 / 3.0f;
 		// U = time
 		u = u + dt;
-		float v = u / 2;
+		dt = dt / 3.0f; // => b = 1/9 mivel deriváltja ennyi
+		float dvdt = 1 / 9.0f;
+
+		v = v + dt;
 		VertexData data = toruszGeometry->GenVertexData(u, v);
+
+		sebesseg = toruszGeometry->GetSebesseg(u, v,dudt,dvdt);
 
 		return data;
 	}

@@ -121,4 +121,25 @@ public:
 		vd.u = u; vd.v = v;
 		return vd;
 	}
+
+	vec3 GetSebesseg(float u, float v, float dudt, float dvdt)
+	{
+		float R = radiusFromCenter;
+		float r = radiusTorus;
+		//Sebesseg kiszamol
+		float X_du = -2 * M_PI* r *cos(2 * M_PI* v) *sin(2 * M_PI *u);
+		float X_dv = -2 * M_PI* (R + r *cos(2 * M_PI* u)) *sin(2 * M_PI* v);
+
+		float Y_du = 2 * M_PI *r *cos(2 * M_PI* u);
+		float Y_dv = 0;
+
+		float Z_du = -2 * M_PI *r *sin(2 * M_PI* u) *sin(2 * M_PI *v);
+		float Z_dv = 2 * M_PI*(R + r* cos(2 * M_PI *u)) *cos(2 * M_PI* v);
+
+		vec3 U(X_du, Y_du, Z_du);
+		vec3 V(X_dv, Y_dv, Z_dv);
+
+		vec3 elkeszult = U*dudt + V*dvdt;
+		return elkeszult;
+	}
 };
