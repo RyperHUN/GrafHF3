@@ -87,6 +87,12 @@ public:
 		return vd;
 	}
 	float getRadius() { return radius; }
+
+	vec3 getSzogsebesseg(vec3 const& sebesseg)
+	{
+		vec3 modif = sebesseg;
+		return modif *  (1 / radius);
+	}
 };
 
 class Torus : public ParamSurface {

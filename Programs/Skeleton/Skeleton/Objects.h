@@ -105,14 +105,16 @@ public:
 
 		pos = pos + normalTolas;
 		
+		vec3 omegaVec = sphereGeometry->getSzogsebesseg(sebesseg);
+		float omegaFloat = omegaVec.Length()*dt;
 		//Forgatas
 		vec3 eloreVektor = sebesseg;
 		eloreVektor = eloreVektor.normalize();
 		rotAxis = cross(eloreVektor, data.normal.normalize());
 		rotAxis = rotAxis.normalize();
-		rotAngle = dt*4.0f;
+		//rotAngle = dt*4.0f;
 
-		rotateMatrix = rotateMatrix* Rotate(rotAngle, rotAxis.x, rotAxis.y, rotAxis.z);
+		rotateMatrix = rotateMatrix* Rotate(-omegaFloat, rotAxis.x, rotAxis.y, rotAxis.z);
 	}
 	///TODO kommentezd ki ha normális forgatást akarsz
 	void Draw(RenderState state) {  //RenderState mi az a renderstate?
@@ -132,12 +134,12 @@ private:
 	VertexData getPosOnTorus(float dt, vec3 &sebesseg)
 	{
 		///TODO v ami az ut derivaltja
-		dt = dt / 3.0f; // => a = 1/3 mivel deriváltja ennyi
-		float dudt = 1 / 3.0f;
+		dt = dt / 4.0f; // => a = 1/3 mivel deriváltja ennyi
+		float dudt = 1 / 4.0f;
 		// U = time
 		u = u + dt;
-		dt = dt / 3.0f; // => b = 1/9 mivel deriváltja ennyi
-		float dvdt = 1 / 9.0f;
+		dt = dt / 4.0f; // => b = 1/9 mivel deriváltja ennyi
+		float dvdt = 1 / 16.0f;
 
 		v = v + dt;
 		VertexData data = toruszGeometry->GenVertexData(u, v);
