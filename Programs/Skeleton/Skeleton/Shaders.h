@@ -30,6 +30,7 @@ class ShaderFennyel : public Shader
     	precision highp float;
 	uniform mat4  MVP, M, Minv; // MVP, Model, Model-inverse
 	uniform vec4  wLiPos;       // pos of light source 
+	uniform vec4  wLiPos2;
 	uniform vec3  wEye;         // pos of eye
 
 	in  vec3 vtxPos;            // pos in modeling space
@@ -39,7 +40,8 @@ class ShaderFennyel : public Shader
 	out vec3 wNormal;           // normal in world space
 	out vec3 wView;             // view in world space
 	out vec3 wLight;            // light dir in world space
-	
+	out vec3 wLight2;	
+
 	out vec4 wLightPos;
 	out vec4 wPos;
 
@@ -50,6 +52,7 @@ class ShaderFennyel : public Shader
 	   wLightPos = wLiPos;
 	   
 	   wLight  = wLiPos.xyz * wPos.w - wPos.xyz * wLiPos.w;
+	   wLight2 = wLiPos2.xyz * wPos.w - wPos.xyz * wLiPos2.w;
 	   wView   = wEye * wPos.w - wPos.xyz;
 	   wNormal = (Minv * vec4(vtxNorm, 0)).xyz;
 	   
@@ -62,10 +65,9 @@ class ShaderFennyel : public Shader
 	#version 130
     	precision highp float;
 
-
-
 	uniform vec3 kd, ks, ka;// diffuse, specular, ambient ref
 	uniform vec3 La, Le;    // ambient and point source rad
+	uniform vec3 La2, Le2;
 	uniform float shine;    // shininess for specular ref
 
 	in vec4 wLightPos;
@@ -74,11 +76,12 @@ class ShaderFennyel : public Shader
 	in  vec3 wNormal;       // interpolated world sp normal
 	in  vec3 wView;         // interpolated world sp view
 	in  vec3 wLight;        // interpolated world sp illum dir
+	in  vec3 wLight2;
 	out vec4 fragmentColor; // output goes to frame buffer
 
 vec3 getColor()
 {
-	vec3 N = normalize(wNormal);
+	   vec3 N = normalize(wNormal);
 	   vec3 V = normalize(wView);  
 	   vec3 L = normalize(wLight);
 	   vec3 H = normalize(L + V);
@@ -93,6 +96,19 @@ vec3 getColor()
 	   vec3 color = ka * La + 
 				   (kd * cost + ks * pow(cosd,shine)) * Lee;
 				   
+		vec3 L2 = normalize(wLight2);
+		
+		N = normalize(wNormal);
+		V = normalize(wView);  
+	    L = normalize(wLight);
+		H = normalize(L2 + V);
+		
+	    float cost2 = max(dot(N,L2), 0);
+	    float cosd2 = max(dot(N,H), 0);
+		
+		//color = color + ka* La2 + (kd * cost2 + ks * pow(cosd2,shine)) * Le2;
+		color = color + 0*La2 + 0* Le2; //Kamu sor debugra
+		
 	   return color;
 }
 
@@ -172,10 +188,8 @@ public:
 		state.Minv.SetUniform(shaderProgram, "Minv");
 		state.M.SetUniform(shaderProgram, "M");
 
-		Light* light = state.light;
-		int location = getUniform("wLiPos");
-		glUniform4f(location, light->wLightPos.v[0], light->wLightPos.v[1], light->wLightPos.v[2], light->wLightPos.v[3]);
-
+		
+		int location = 0;
 		vec3 wEye = state.wEye;
 		location = getUniform("wEye");
 		glUniform3f(location, wEye.x, wEye.y, wEye.z);
@@ -195,9 +209,20 @@ public:
 		glUniform3f(location, ka.x, ka.y, ka.z);
 
 		//Feny
+		Light* light = state.light1;
+		location = getUniform("wLiPos");
+		glUniform4f(location, light->wLightPos.v[0], light->wLightPos.v[1], light->wLightPos.v[2], light->wLightPos.v[3]);
 		location = getUniform("La");
 		glUniform3f(location, light->La.x, light->La.y, light->La.z);
 		location = getUniform("Le");
+		glUniform3f(location, light->Le.x, light->Le.y, light->Le.z);
+
+		light = state.light2;
+		location = getUniform("wLiPos2");
+		glUniform4f(location, light->wLightPos.v[0], light->wLightPos.v[1], light->wLightPos.v[2], light->wLightPos.v[3]);
+		location = getUniform("La2");
+		glUniform3f(location, light->La.x, light->La.y, light->La.z);
+		location = getUniform("Le2");
 		glUniform3f(location, light->Le.x, light->Le.y, light->Le.z);
 		//====================== FRAGMENT SHADER KESZ ================================//
 	}
@@ -473,7 +498,7 @@ public:
 		int location = getUniform("wEye");
 		glUniform3f(location, wEye.x, wEye.y, wEye.z);
 
-		Light* light = state.light;
+		Light* light = state.light1;
 		location = getUniform("wLiPos");
 		glUniform4f(location, light->wLightPos.v[0], light->wLightPos.v[1], light->wLightPos.v[2], light->wLightPos.v[3]);
 		//====================== VERTEX SHADER BETOLTVE ================================//

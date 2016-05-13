@@ -40,12 +40,12 @@ public:
 		int k = 0;
 		for (int i = 0; i < N; i++)
 			for (int j = 0; j < M; j++) {
-				pVtx[k++] = GenVertexData((float)i / N, (float)j / M); printf("pos:x: %f, y %f z %f \n", pVtx[k - 1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
-				pVtx[k++] = GenVertexData((float)(i + 1) / N, (float)j / M); printf("pos:x: %f, y %f z %f \n", pVtx[k - 1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
-				pVtx[k++] = GenVertexData((float)i / N, (float)(j + 1) / M); printf("pos:x: %f, y %f z %f \n", pVtx[k - 1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
-				pVtx[k++] = GenVertexData((float)(i + 1) / N, (float)j / M); printf("pos:x: %f, y %f z %f \n", pVtx[k - 1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
-				pVtx[k++] = GenVertexData((float)(i + 1) / N, (float)(j + 1) / M); printf("pos:x: %f, y %f z %f \n", pVtx[k - 1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
-				pVtx[k++] = GenVertexData((float)i / N, (float)(j + 1) / M); printf("pos:x: %f, y %f z %f \n", pVtx[k - 1].position.x, pVtx[k - 1].position.y, pVtx[k - 1].position.z);
+				pVtx[k++] = GenVertexData((float)i / N, (float)j / M); 
+				pVtx[k++] = GenVertexData((float)(i + 1) / N, (float)j / M);
+				pVtx[k++] = GenVertexData((float)i / N, (float)(j + 1) / M);
+				pVtx[k++] = GenVertexData((float)(i + 1) / N, (float)j / M);
+				pVtx[k++] = GenVertexData((float)(i + 1) / N, (float)(j + 1) / M);
+				pVtx[k++] = GenVertexData((float)i / N, (float)(j + 1) / M);
 			}
 
 		int stride = sizeof(VertexData), sVec3 = sizeof(vec3);

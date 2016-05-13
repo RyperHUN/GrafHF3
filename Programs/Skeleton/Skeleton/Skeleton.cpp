@@ -196,7 +196,8 @@ bool Camera::isFollowing = false;
 class Scene {
 	Camera camera;
 	vector<Object *> objects;
-	Light* light;
+	Light* light1;
+	Light* light2;
 	RenderState state;
 	
 public:
@@ -222,7 +223,8 @@ public:
 		state.wEye = camera.wEye;
 		state.V = camera.V();
 		state.P = camera.P();
-		state.light = light;
+		state.light1 = light1;
+		state.light2 = light2;
 		for (Object * obj : objects) 
 			obj->Draw(state);
 	}
@@ -232,7 +234,9 @@ public:
 			obj->Animate(dt);
 		camera.Animate(dt);
 		camera.follow(*SpherePos);
-		light->Animate(dt);
+
+		light1->Animate(dt);
+		light2->Animate(dt);
 	}
 	void forgatOnOff()
 	{
@@ -246,9 +250,13 @@ public:
 		glReadPixels(clickCoord.v[0], clickCoord.v[1], 1, 1, GL_RGB, GL_FLOAT, &data);
 		int i = 11;
 	}
-	void setLight(Light *light)
+	void setLight1(Light *light)
 	{
-		this->light = light;
+		this->light1 = light;
+	}
+	void setLight2(Light *light)
+	{
+		this->light2 = light;
 	}
 };
 
@@ -287,7 +295,9 @@ void onInitialization() {
 	scene.SpherePos = guruloGomb->getPos();
 	
 	PattogoLight* pattogoLight = new PattogoLight(vec4(-4, 0, -4), vec3(1, 1, 1), vec3(1, 1, 1), torusGeometry);
-	scene.setLight(pattogoLight);
+	Light* lightSima = new Light(vec4(-4, 0, -4), vec3(1, 1, 1), vec3(1,1,1));
+	scene.setLight1(pattogoLight);
+	scene.setLight2(lightSima);
 
 	scene.AddObject(guruloGomb);
 	scene.AddObject(torus);

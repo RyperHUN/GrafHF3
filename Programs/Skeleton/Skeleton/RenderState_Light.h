@@ -51,7 +51,8 @@ struct RenderState {
 	mat4 M, V, P, Minv;
 	Material* material;
 	Texture* texture;
-	Light* light;
+	Light* light1;
+	Light* light2;
 	///TODO light?? esetleg pointer
 	vec3 wEye;
 	RenderState() 
