@@ -23,7 +23,7 @@ public:
 		MVP.SetUniform(shaderProgram, "MVP");
 	}
 };
-class ShaderPhong : public Shader
+class ShaderFennyel : public Shader
 {
 	const char *vertexSource = R"(
 	#version 130
@@ -35,7 +35,7 @@ class ShaderPhong : public Shader
 
 	in  vec3 vtxPos;            // pos in modeling space
 	in  vec3 vtxNorm;           // normal in modeling space
-	in  vec2 uv;						// Miert nincs ez hasznalva?
+	in  vec2 uv;           // Miert nincs ez hasznalva?
 
 	out vec3 wNormal;           // normal in world space
 	out vec3 wView;             // view in world space
@@ -141,7 +141,7 @@ public:
 	//unsigned int vertexShaderID;  // Esetleg ezeket is eltárolni
 	//unsigned int fragmentShaderID;
 	// vertex shader in GLSL
-	ShaderPhong()
+	ShaderFennyel()
 	{
 	}
 
@@ -242,151 +242,6 @@ public:
 		//====================== FRAGMENT SHADER KESZ ================================//
 	}
 };
-
-class ShaderGoraud : public Shader
-{
-	const char *vertexSource = R"(
-	#version 130
-    	precision highp float;
-	uniform mat4  MVP, M, Minv; // MVP, Model, Model-inverse
-	uniform vec4  kd, ks, ka;   // diffuse, specular, ambient ref
-	uniform vec4  La, Le;       // ambient and point sources
-	uniform vec4  wLiPos;       // pos of light source in world
-	uniform vec3  wEye;         // pos of eye in world
-	uniform float shine;		 // shininess for specular ref
-
-	in vec3 vtxPos;     		 // pos in modeling space
-	in vec3 vtxNorm;            // normal in modeling space
-	in vec2 uv;
-	out vec4 color;             // computed vertex color
-
-	void main() {
-	   gl_Position = vec4(vtxPos, 1) * MVP; // to NDC
-
-	   vec4 wPos = vec4(vtxPos, 1) * M;
-	   vec3 L = normalize( wLiPos.xyz * wPos.w - wPos.xyz * wLiPos.w);
-	   vec3 V = normalize(wEye * wPos.w - wPos.xyz);
-	   vec4 wNormal = Minv * vec4(vtxNorm, 0);
-	   vec3 N = normalize(wNormal.xyz);
-	   vec3 H = normalize(L + V);
-	   float cost = max(dot(N, L), 0), cosd = max(dot(N, H), 0);
-	   color = ka * La + (kd * cost + ks * pow(cosd, shine)) * Le;
-	}
-
-)";
-
-	// fragment shader in GLSL
-	const char *fragmentSource = R"(
-	#version 130
-    	precision highp float;
-	in vec4 color;          // interpolated color of vertex shader
-	out vec4 fragmentColor; // output goes to frame buffer
-
-	void main() {
-	   fragmentColor = color; 
-	}
-	)";
-	vec3 color;
-public:
-
-	//unsigned int programID;
-
-	//unsigned int vertexShaderID;  // Esetleg ezeket is eltárolni
-	//unsigned int fragmentShaderID;
-	// vertex shader in GLSL
-	ShaderGoraud()
-	{
-	}
-
-	void createShader()
-	{
-		unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		if (!vertexShader) {
-			printf("Error in vertex shader creation\n");
-			exit(1);
-		}
-		glShaderSource(vertexShader, 1, &vertexSource, NULL);
-		glCompileShader(vertexShader);
-		checkShader(vertexShader, "Vertex shader error");
-
-		// Create fragment shader from string
-		unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		if (!fragmentShader) {
-			printf("Error in fragment shader creation\n");
-			exit(1);
-		}
-		glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-		glCompileShader(fragmentShader);
-		checkShader(fragmentShader, "Fragment shader error");
-
-		// Attach shaders to a single program
-		shaderProgram = glCreateProgram();
-		if (!shaderProgram) {
-			printf("Error in shader program creation\n");
-			exit(1);
-		}
-		glAttachShader(shaderProgram, vertexShader);
-		glAttachShader(shaderProgram, fragmentShader);
-
-		bindAttributes();
-
-		// program packaging
-		glLinkProgram(shaderProgram);
-		checkLinking(shaderProgram);
-		// make this program run
-		glUseProgram(shaderProgram);
-
-		//Toroljuk a shadereket - Mar hozzaadtuk a programhoz szoval mar nem kell
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
-	}
-	void bindAttributes()
-	{
-		// Connect Attrib Arrays to input variables of the vertex shader
-		glBindAttribLocation(shaderProgram, 0, "vtxPos"); // vertexPosition gets values from Attrib Array 0
-		glBindAttribLocation(shaderProgram, 1, "vtxNormal"); // vertexPosition gets values from Attrib Array 0
-		glBindAttribLocation(shaderProgram, 2, "uv"); // vertexPosition gets values from Attrib Array 0
-		glBindFragDataLocation(shaderProgram, 0, "fragmentColor");	// fragmentColor goes to the frame buffer memory
-	}
-	void Bind(RenderState& state) {
-		//====================== VERTEX SHADER TOLTES ================================//
-		glUseProgram(shaderProgram);
-		mat4 MVP = state.M * state.V * state.P;
-		MVP.SetUniform(shaderProgram, "MVP");
-		state.Minv.SetUniform(shaderProgram, "Minv");
-		state.M.SetUniform(shaderProgram, "M");
-
-		vec3 wEye = state.wEye;
-		int location = getUniform("wEye");
-		glUniform3f(location, wEye.x, wEye.y, wEye.z);
-
-		Light light = state.light;
-		location = getUniform("wLiPos");
-		glUniform4f(location, light.wLightPos.v[0], light.wLightPos.v[1], light.wLightPos.v[2], light.wLightPos.v[3]);
-		//====================== VERTEX SHADER BETOLTVE ================================//
-
-		//====================== FRAGMENT SHADER TOLTES ================================//
-		location = getUniform("kd");
-		vec3 kd = state.material->kd;
-		glUniform3f(location, kd.x, kd.y, kd.z);
-
-		location = getUniform("ks");
-		vec3 ks = state.material->ks;
-		glUniform3f(location, ks.x, ks.y, ks.z);
-
-		location = getUniform("ka");
-		vec3 ka = state.material->ka;
-		glUniform3f(location, ka.x, ka.y, ka.z);
-
-		//Feny
-		location = getUniform("La");
-		glUniform3f(location, light.La.x, light.La.y, light.La.z);
-		location = getUniform("Le");
-		glUniform3f(location, light.Le.x, light.Le.y, light.Le.z);
-
-	}
-};
-
 class ShaderSzines : public Shader
 {
 	const char *vertexSource = R"(
@@ -469,7 +324,7 @@ public:
 		//Toroljuk a shadereket - Mar hozzaadtuk a programhoz szoval mar nem kell
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
-	}//taln
+	}
 	void bindAttributes()
 	{
 		// Connect Attrib Arrays to input variables of the vertex shader
