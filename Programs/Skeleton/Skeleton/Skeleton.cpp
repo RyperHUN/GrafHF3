@@ -292,7 +292,7 @@ void onInitialization() {
 	Torus* torusGeometry = new Torus(1, 4,torusCenter);
 	ForgoObjektum* torus = new ForgoObjektum(shaderFennyel, tesztPiros, nullptr, torusGeometry, vec3(1, 0, 0), torusCenter);
 
-	Sphere* sphereKicsiGeometry = new Sphere(vec3(0, 0, 0), 0.1f, 10, 10);
+	Sphere* sphereKicsiGeometry = new Sphere(vec3(0, 0, 0), 0.05f, 10, 10);
 	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.4f);
 	//ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztKek,nullptr,sphereGeometry, vec3(0,1,0),vec3(-4,0,-5.3f));
 	ForgoGomb* guruloGomb = new ForgoGomb(shaderFennyel, tesztKek, nullptr, sphereGeometry, vec3(0, 1, 0), torusCenter,torusGeometry);
@@ -300,14 +300,14 @@ void onInitialization() {
 
 	scene.SpherePos = guruloGomb->getPos();
 	
-	PattogoLight* pattogoLight = new PattogoLight(vec4(-4, 0, -4), vec3(1, 1, 1), vec3(1, 1, 1), torusGeometry);
+	PattogoLight* pattogoLight = new PattogoLight(vec4(-4, 0, -5.2f,1), vec3(1, 1, 1), vec3(1, 1, 1), torusGeometry);
 	Light* lightSima = new Light(vec4(-4, 0, -4), vec3(1, 1, 1), vec3(1,1,1));
 	scene.setLight1(pattogoLight);
 	scene.setLight2(lightSima);
 
 	scene.AddObject(guruloGomb);
 	scene.AddObject(torus);
-	//scene.AddObject(pattogoGomb);
+	scene.AddObject(pattogoGomb);
 	
 
 	// Create objects by setting up their vertex data on the GPU

@@ -55,8 +55,6 @@ class ShaderFennyel : public Shader
 	   wLight2 = wLiPos2.xyz * wPos.w - wPos.xyz * wLiPos2.w;
 	   wView   = wEye * wPos.w - wPos.xyz;
 	   wNormal = (Minv * vec4(vtxNorm, 0)).xyz;
-	   
-	   
 	}
 )";
 
@@ -78,7 +76,23 @@ class ShaderFennyel : public Shader
 	in  vec3 wLight;        // interpolated world sp illum dir
 	in  vec3 wLight2;
 	out vec4 fragmentColor; // output goes to frame buffer
-
+vec3 colorNormalize(vec3 clr)
+{
+	if(clr.x <= 0)
+		clr.x = 0.1f;
+	if(clr.y <= 0)
+		clr.y = 0.1f;
+	if(clr.z <= 0)
+		clr.z = 0.1f;
+	
+	if(clr.x > 1.0f)
+		clr.x = 1.0f;
+	if(clr.y > 1.0f)
+		clr.y = 1.0f;
+	if(clr.z > 1.0f)
+		clr.z = 1.0f;
+	return clr;
+}
 vec3 getColor()
 {
 	   vec3 N = normalize(wNormal);
@@ -92,24 +106,25 @@ vec3 getColor()
 	   float distance = length(lightDistance);
 	   
 	   vec3 Lee = Le / (distance*distance);
-	   
-	   vec3 color = ka * La + 
-				   (kd * cost + ks * pow(cosd,shine)) * Lee;
-				   
+	   vec3 color;
+	   vec3 color1 = ka * La + (kd * cost + ks * pow(cosd,shine)) * Lee;
+	   color = color + ka * La * 0.0f + (kd * cost + ks * pow(cosd,shine)) * Lee * 0.0f; // Kamu sor debugra	   
+		
 		vec3 L2 = normalize(wLight2);
+		vec3 N2 = normalize(wNormal);
+		vec3 V2 = normalize(wView); 
+		vec3 H2 = normalize(L2 + V2);
 		
-		N = normalize(wNormal);
-		V = normalize(wView);  
-	    L = normalize(wLight);
-		H = normalize(L2 + V);
+		color = colorNormalize(color1);
 		
-	    float cost2 = max(dot(N,L2), 0);
-	    float cosd2 = max(dot(N,H), 0);
+	    float cost2 = max(dot(N2,L2), 0);
+	    float cosd2 = max(dot(N2,H2), 0);
 		
-		//color = color + ka* La2 + (kd * cost2 + ks * pow(cosd2,shine)) * Le2;
+		vec3 color2 = ka* La2 + (kd * cost2 + ks * pow(cosd2,shine)) * Le2;
+		color = color1 + color2;
 		color = color + 0*La2 + 0* Le2; //Kamu sor debugra
 		
-	   return color;
+	   return color1;
 }
 
 	void main() {
