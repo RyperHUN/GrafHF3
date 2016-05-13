@@ -196,24 +196,20 @@ bool Camera::isFollowing = false;
 class Scene {
 	Camera camera;
 	vector<Object *> objects;
-	Light light;
+	Light* light;
 	RenderState state;
 	
 public:
 	vec3 *SpherePos;
 	///TODO megirni hogy inicializaljon mindent
 	Scene()
-		: camera(vec3(0,0,2),vec3(0,0,-1),vec3(0,1,0),90,0.1,13),
-		  light(vec4(0,0,0,1),vec3(1,1,1),vec3(1,1,1)),
-		  state(light)
+		: camera(vec3(0,0,2),vec3(0,0,-1),vec3(0,1,0),90,0.1,13)
 	{
 		//Torusba ha benne vagy ezt ne kommentezd ki
 		vec3 campos(-4, 0, -4);
 		//campos = vec3(0, 2, 4);
 
 		vec4 lightPos(campos.x, campos.y, campos.z);
-
-		light.wLightPos = lightPos;
 		
 		
 		camera.setCenter(campos,campos + vec3(0,0,-1) );
@@ -236,7 +232,7 @@ public:
 			obj->Animate(dt);
 		camera.Animate(dt);
 		camera.follow(*SpherePos);
-		light.Animate(dt);
+		light->Animate(dt);
 	}
 	void forgatOnOff()
 	{
@@ -249,6 +245,10 @@ public:
 		GLfloat data[3];
 		glReadPixels(clickCoord.v[0], clickCoord.v[1], 1, 1, GL_RGB, GL_FLOAT, &data);
 		int i = 11;
+	}
+	void setLight(Light *light)
+	{
+		this->light = light;
 	}
 };
 
@@ -270,13 +270,13 @@ void onInitialization() {
 	ShaderFennyel* shaderFennyel = new ShaderFennyel();
 	shaderFennyel->createShader();
 
-	Material* tesztPiros = new Material(vec3(0, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0.1f), 10, true, false);
+	Material* tesztPiros = new Material(vec3(0.4, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.5f, 0.5f, 0.5f), 10, true, false);
 	Material* tesztZold = new Material(vec3(0, 0.5f, 0.1f), vec3(0.1f, 0.5f, 0.1f), vec3(0.1f, 0.5, 0.1f), 10, true, false);
 	Material* tesztKek = new Material(vec3(0.1f, 0.1f, 0.4f), vec3(0.1f, 0.1f, 0.5f), vec3(1, 1, 1), 10, true, false);
 
 	vec3 torusCenter = vec3(0, 0, -5);
 	Torus* torusGeometry = new Torus(1, 4,torusCenter);
-	ForgoObjektum* torus = new ForgoObjektum(shaderTexture, tesztPiros, nullptr, torusGeometry, vec3(1, 0, 0), torusCenter);
+	ForgoObjektum* torus = new ForgoObjektum(shaderFennyel, tesztPiros, nullptr, torusGeometry, vec3(1, 0, 0), torusCenter);
 
 	Sphere* sphereKicsiGeometry = new Sphere(vec3(0, 0, 0), 0.1f, 10, 10);
 	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.4f);
@@ -286,10 +286,12 @@ void onInitialization() {
 
 	scene.SpherePos = guruloGomb->getPos();
 	
+	PattogoLight* pattogoLight = new PattogoLight(vec4(-4, 0, -4), vec3(1, 1, 1), vec3(1, 1, 1), torusGeometry);
+	scene.setLight(pattogoLight);
 
 	scene.AddObject(guruloGomb);
 	scene.AddObject(torus);
-	scene.AddObject(pattogoGomb);
+	//scene.AddObject(pattogoGomb);
 	
 
 	// Create objects by setting up their vertex data on the GPU

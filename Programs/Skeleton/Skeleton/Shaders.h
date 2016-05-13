@@ -172,9 +172,9 @@ public:
 		state.Minv.SetUniform(shaderProgram, "Minv");
 		state.M.SetUniform(shaderProgram, "M");
 
-		Light light = state.light;
+		Light* light = state.light;
 		int location = getUniform("wLiPos");
-		glUniform4f(location, light.wLightPos.v[0], light.wLightPos.v[1], light.wLightPos.v[2], light.wLightPos.v[3]);
+		glUniform4f(location, light->wLightPos.v[0], light->wLightPos.v[1], light->wLightPos.v[2], light->wLightPos.v[3]);
 
 		vec3 wEye = state.wEye;
 		location = getUniform("wEye");
@@ -196,9 +196,9 @@ public:
 
 		//Feny
 		location = getUniform("La");
-		glUniform3f(location, light.La.x, light.La.y, light.La.z);
+		glUniform3f(location, light->La.x, light->La.y, light->La.z);
 		location = getUniform("Le");
-		glUniform3f(location, light.Le.x, light.Le.y, light.Le.z);
+		glUniform3f(location, light->Le.x, light->Le.y, light->Le.z);
 		//====================== FRAGMENT SHADER KESZ ================================//
 	}
 };
@@ -473,9 +473,9 @@ public:
 		int location = getUniform("wEye");
 		glUniform3f(location, wEye.x, wEye.y, wEye.z);
 
-		Light light = state.light;
+		Light* light = state.light;
 		location = getUniform("wLiPos");
-		glUniform4f(location, light.wLightPos.v[0], light.wLightPos.v[1], light.wLightPos.v[2], light.wLightPos.v[3]);
+		glUniform4f(location, light->wLightPos.v[0], light->wLightPos.v[1], light->wLightPos.v[2], light->wLightPos.v[3]);
 		//====================== VERTEX SHADER BETOLTVE ================================//
 
 		//====================== FRAGMENT SHADER TOLTES ================================//
@@ -493,9 +493,9 @@ public:
 
 		//Feny
 		location = getUniform("La");
-		glUniform3f(location, light.La.x, light.La.y, light.La.z);
+		glUniform3f(location, light->La.x, light->La.y, light->La.z);
 		location = getUniform("Le");
-		glUniform3f(location, light.Le.x, light.Le.y, light.Le.z);
+		glUniform3f(location, light->Le.x, light->Le.y, light->Le.z);
 
 		//if (state.texture != nullptr)
 		//{
