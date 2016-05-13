@@ -143,8 +143,9 @@ public:
 		wWx += x;
 		wWy += y;
 	}
-	void Animate(float t) {
-		//wEye.y +=  0.0001f * sinf(t);
+	void Animate(float dt,vec3 sebesseg) 
+	{
+		wEye = wEye + sebesseg*dt;
 	}
 	void follow(vec3 SpherePos)
 	{
@@ -199,13 +200,14 @@ class Scene {
 	Light* light1;
 	Light* light2;
 	RenderState state;
-	
+	vec3 sebesseg;
 public:
 	vec3 *SpherePos;
 	///TODO megirni hogy inicializaljon mindent
 	Scene()
 		: camera(vec3(0,0,2),vec3(0,0,-1),vec3(0,1,0),90,0.1,13)
 	{
+		sebesseg = vec3(0, 0, 0);
 		//Torusba ha benne vagy ezt ne kommentezd ki
 		vec3 campos(-4, 0, -4);
 		//campos = vec3(0, 2, 4);
@@ -232,11 +234,13 @@ public:
 	void Animate(float dt) {
 		for (Object * obj : objects) 
 			obj->Animate(dt);
-		camera.Animate(dt);
+
+		camera.Animate(dt,sebesseg);
 		camera.follow(*SpherePos);
 
 		light1->Animate(dt);
 		light2->Animate(dt);
+		
 	}
 	void forgatOnOff()
 	{
@@ -245,10 +249,12 @@ public:
 	}
 	void convertClickCoord(vec4 clickCoord)
 	{
-		///Ezt hogy a francba??
+		/*///Ezt hogy a francba??
 		GLfloat data[3];
 		glReadPixels(clickCoord.v[0], clickCoord.v[1], 1, 1, GL_RGB, GL_FLOAT, &data);
-		int i = 11;
+		int i = 11;*/
+		sebesseg = vec3(clickCoord.v[0], clickCoord.v[1], clickCoord.v[2]);
+		sebesseg = sebesseg.normalize();
 	}
 	void setLight1(Light *light)
 	{
@@ -361,7 +367,11 @@ void onMouse(int button, int state, int pX, int pY) {
 		float cX = (2.0f * pX / windowWidth) - 1;	// flip y axis
 		float cY = 1.0f - (2.0f * pY / windowHeight);
 
-		vec4 clickKoord(cX, cY, 0.0f, 1.0f);
+		float xAbs = fabs(cX);
+		float yAbs = fabs(cY);
+		float z = xAbs*yAbs;
+
+		vec4 clickKoord(cX, cY, -z, 1.0f);
 
 		scene.convertClickCoord(clickKoord);
 		
