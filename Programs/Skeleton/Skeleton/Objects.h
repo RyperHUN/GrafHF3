@@ -7,6 +7,7 @@
 #include "Geometry.h"
 
 class Object {
+protected:
 	Shader *   shader;
 	Material * material;
 	Texture *  texture;
@@ -17,7 +18,7 @@ public:
 	Object()
 	{
 	}
-	Object(Shader * shader, Material* material, Texture * texture, Geometry* geometry)
+	Object(Shader * shader, Material* material, Texture * texture, Geometry* geometry,vec3 position)
 		:shader(shader), material(material), texture(texture), geometry(geometry)
 	{
 		scale = vec3(1, 1, 1);
@@ -44,17 +45,12 @@ public:
 
 class ForgoObjektum : public Object {
 protected:
-	Shader *   shader;
-	Material * material;
-	Texture *  texture;
-	Geometry * geometry;
-	vec3 scale, pos, rotAxis;
-	float rotAngle;
 	bool isForgat = false;
 public:
 	ForgoObjektum(Shader * shader,Material* material,Texture * texture, Geometry* geometry,vec3 rotAxis,vec3 pos)
-		:shader(shader),material(material),texture(texture),geometry(geometry),rotAxis(rotAxis),pos(pos)
+		:Object(shader,material,texture,geometry,pos)
 	{
+		this->rotAxis = rotAxis;
 		scale = vec3(1, 1, 1);
 		rotAngle = 0;
 	}
@@ -147,5 +143,45 @@ private:
 		sebesseg = toruszGeometry->GetSebesseg(u, v,dudt,dvdt);
 
 		return data;
+	}
+};
+
+class PattogoGomb : public Object {
+	Torus* toruszGeometry;
+	float u = 0;
+	float v = 0;
+	const vec3 constPos; //Megegyezik a toruszeval! Es ehhez kepes megyunk meg balra jobbra!
+	Sphere* sphereGeometry;
+	mat4 rotateMatrix;
+public:
+	PattogoGomb(Shader * shader, Material* material, Texture * texture, Sphere* geometry, vec3 rotAxis, vec3 pos, Torus* toruszGeometry)
+		: Object(shader, material, texture, geometry, pos),
+		toruszGeometry(toruszGeometry), constPos(pos), sphereGeometry(geometry)
+	{
+
+	}
+	vec3* getPos() { return &pos; }
+	void Animate(float dt)
+	{
+		
+	}
+	///TODO kommentezd ki ha normális forgatást akarsz
+	void Draw(RenderState state) {  //RenderState mi az a renderstate?
+		mat4 Mscale = Scale(scale.x, scale.y, scale.z);
+		mat4 Mrotate = rotateMatrix;
+		mat4 Mtranslate = Translate(pos.x, pos.y, pos.z);
+		mat4 MrotateInverse = rotateMatrix.Transpose();
+		state.M = Mscale*Mrotate*Mtranslate;
+		state.Minv = Translate(-pos.x, -pos.y, -pos.z) *
+			MrotateInverse *
+			Scale(1 / scale.x, 1 / scale.y, 1 / scale.z);
+		state.material = material; state.texture = texture;
+		shader->Bind(state);
+		geometry->Draw();
+	}
+private:
+	VertexData getPosOnTorus(float dt, vec3 &sebesseg)
+	{
+		
 	}
 };
