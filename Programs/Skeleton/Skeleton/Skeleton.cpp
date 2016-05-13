@@ -79,7 +79,7 @@ struct Camera {
 	vec3  wEye, wLookat, wVup;
 	float fov, asp, nearPlane, farPlane;
 
-	float wCx, wCy;	// center in world coordinates
+
 	float wWx, wWy;	// width and height in world coordinates
 	static bool isFollowing;
 public:
@@ -90,6 +90,13 @@ public:
 		isFollowing = false;
 	}
 
+	//mat4 V() { // view matrix: translates the center to the origin
+	//	return mat4(1, 0, 0, -wCx,
+	//		0, 1, 0, -wCy,
+	//		0, 0, 1, 0,
+	//		0, 0, 0, 1);
+	//}
+	///TODO inverzét megcsinálni!
 	mat4 V() { // view matrix
 		vec3 w = (wEye - wLookat).normalize();
 		vec3 u = cross(wVup, w).normalize();
@@ -111,8 +118,15 @@ public:
 			v.x, v.y, v.z, 0.0f,
 			w.x, w.y, w.z, 0.0f,
 			0.0f, 0.0f, 0.0f, 1.0f) * Translate(wEye.x, wEye.y, wEye.z);
-			
-	}
+
+
+	//mat4 P() { // projection matrix: scales it to be a square of edge length 2
+	//	return mat4(2 / wWx, 0, 0, 0,
+	//		0, 2 / wWy, 0, 0,
+	//		0, 0, 1, 0,
+	//		0, 0, 0, 1);
+	//}
+	///TODO
 	mat4 P() { // projection matrix
 		float sy = 1 / tan(fov / 2 * M_PI / 180);
 		float alfa = -(nearPlane + farPlane) / (farPlane - nearPlane);
@@ -153,7 +167,7 @@ public:
 		{
 			this->wLookat.x = SpherePos.x;
 			this->wLookat.z = SpherePos.z;
-		}
+	}
 
 	}
 	void loadProjViewMatrixes(int shaderProgram)
@@ -178,7 +192,7 @@ public:
 	static void toggleFollow()
 	{
 		isFollowing = !isFollowing;
-	}
+		}
 };
 bool Camera::isFollowing = false;
 //2D camera
@@ -281,9 +295,9 @@ void onInitialization() {
 	shaderSzines->createShader();
 	shaderSzines->setColor(vec3(1, 0, 0));
 
-	ShaderFennyel* shaderFennyel = new ShaderFennyel();
+	ShaderPhong* shaderFennyel = new ShaderPhong();
 	shaderFennyel->createShader();
-
+	
 	Material* tesztPiros = new Material(vec3(0.4, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.5f, 0.5f, 0.5f), 10, true, false);
 	Material* tesztZold = new Material(vec3(0, 0.5f, 0.1f), vec3(0.1f, 0.5f, 0.1f), vec3(0.1f, 0.5, 0.1f), 10, true, false);
 	Material* tesztKek = new Material(vec3(0.1f, 0.1f, 0.4f), vec3(0.1f, 0.1f, 0.5f), vec3(1, 1, 1), 10, true, false);
@@ -299,7 +313,7 @@ void onInitialization() {
 	PattogoGomb* pattogoGomb = new PattogoGomb(shaderFennyel, tesztZold, nullptr, sphereKicsiGeometry, vec3(0, 1, 0), vec3(-4, 0, -5.2f), torusGeometry);
 
 	scene.SpherePos = guruloGomb->getPos();
-	
+
 	PattogoLight* pattogoLight = new PattogoLight(vec4(-4, 0, -5.2f,1), vec3(1, 1, 1), vec3(1, 1, 1), torusGeometry);
 	Light* lightSima = new Light(vec4(-4, 0, -4), vec3(1, 1, 1), vec3(1,1,1));
 	scene.setLight1(pattogoLight);
@@ -366,7 +380,7 @@ void onMouse(int button, int state, int pX, int pY) {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {  // GLUT_LEFT_BUTTON / GLUT_RIGHT_BUTTON and GLUT_DOWN / GLUT_UP
 		float cX = (2.0f * pX / windowWidth) - 1;	// flip y axis
 		float cY = 1.0f - (2.0f * pY / windowHeight);
-
+		
 		float depth;
 		pY = windowHeight - pY; // Igy az origo a bal also sarokba lesz.
 		glReadPixels(pX, pY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
