@@ -271,3 +271,13 @@ mat4 Rotate(float rotAngle, float xAxis, float yAxis, float zAxis)
 		);
 	return rodriguez;
 }
+
+vec3 reflect(vec3 inDir, vec3 normal) {
+	if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
+	{
+		inDir = inDir.normalize();
+		normal = normal.normalize();
+	}
+
+	return inDir - normal * dot(normal, inDir) * 2.0f;
+}

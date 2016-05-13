@@ -76,6 +76,12 @@ public:
 		//Create(22, 15); // tessellation level
 		Create(22, 15); ///TODO ideiglenesen levéve
 	}
+	Sphere(vec3 c, float r, int tessLevel1,int tessLevel2 ) 
+		: center(c), radius(r) 
+	{
+		//Create(22, 15); // tessellation level
+		Create(tessLevel1, tessLevel2); ///TODO ideiglenesen levéve
+	}
 
 	VertexData GenVertexData(float u, float v) {
 		VertexData vd;
@@ -99,9 +105,10 @@ class Torus : public ParamSurface {
 	vec3 center;
 	float radiusTorus;
 	float radiusFromCenter;
+	const bool insideTorus = true;
 public:
-	Torus(float radiusTorus, float radiusFromCenter) 
-		: radiusTorus(radiusTorus), radiusFromCenter(radiusFromCenter)
+	Torus(float radiusTorus, float radiusFromCenter,vec3 center) 
+		: radiusTorus(radiusTorus), radiusFromCenter(radiusFromCenter), center(center)
 	{
 		Create(22, 15); // tessellation level
 	}
@@ -121,8 +128,8 @@ public:
 							z*(2 - (2 * R) / sqrtf(x*x + z*z)) 
 						);
 		vd.position = vec3(x,y,z);
-
-		vd.normal = vd.normal * -1.0f;
+		if (insideTorus)
+			vd.normal = vd.normal * -1.0f;
 
 		vd.u = u; vd.v = v;
 		return vd;
@@ -147,5 +154,38 @@ public:
 
 		vec3 elkeszult = U*dudt + V*dvdt;
 		return elkeszult;
+	}
+	vec3 getCenter() { return center; }
+	bool isPointInside(vec3 const& point)
+	{
+		float R = radiusFromCenter;
+		float r = radiusTorus;
+		vec3 torusRelativePoint = point - center;
+		float x = torusRelativePoint.x;
+		float y = torusRelativePoint.y;
+		float z = torusRelativePoint.z;
+
+
+		float eredmeny = powf((R - sqrt(x*x + z*z)),2) + y*y - r*r;
+
+		return eredmeny < 0;
+	}
+	vec3 getNormal(vec3 point)
+	{
+		float R = radiusFromCenter;
+		float r = radiusTorus;
+		vec3 torusRelativePoint = point - center;
+		float x = torusRelativePoint.x;
+		float y = torusRelativePoint.y;
+		float z = torusRelativePoint.z;
+
+		float NormalX = x*(2 - (2 * R) / sqrtf(x*x + z*z));
+		float NormalY = 2 * y;
+		float NormalZ = z*(2 - (2 * R) / sqrtf(x*x + z*z));
+		
+		vec3 normal(NormalX, NormalY, NormalZ);
+		if (insideTorus)
+			normal = normal * -1.0f;
+		return normal;
 	}
 };

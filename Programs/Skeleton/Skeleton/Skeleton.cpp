@@ -270,22 +270,26 @@ void onInitialization() {
 	ShaderFennyel* shaderFennyel = new ShaderFennyel();
 	shaderFennyel->createShader();
 
-	Material* tesztPiros = new Material(vec3(0.2f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0.1f), 10, true, false);
+	Material* tesztPiros = new Material(vec3(0, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0.1f), 10, true, false);
+	Material* tesztZold = new Material(vec3(0, 0.5f, 0.1f), vec3(0.1f, 0.5f, 0.1f), vec3(0.1f, 0.5, 0.1f), 10, true, false);
 	Material* tesztKek = new Material(vec3(0.1f, 0.1f, 0.4f), vec3(0.1f, 0.1f, 0.5f), vec3(1, 1, 1), 10, true, false);
 
 	vec3 torusCenter = vec3(0, 0, -5);
-	Torus* torusGeometry = new Torus(1, 4);
+	Torus* torusGeometry = new Torus(1, 4,torusCenter);
 	ForgoObjektum* torus = new ForgoObjektum(shaderTexture, tesztPiros, nullptr, torusGeometry, vec3(1, 0, 0), torusCenter);
 
+	Sphere* sphereKicsiGeometry = new Sphere(vec3(0, 0, 0), 0.1f, 10, 10);
 	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.4f);
 	//ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztKek,nullptr,sphereGeometry, vec3(0,1,0),vec3(-4,0,-5.3f));
 	ForgoGomb* guruloGomb = new ForgoGomb(shaderFennyel, tesztKek, nullptr, sphereGeometry, vec3(0, 1, 0), torusCenter,torusGeometry);
+	PattogoGomb* pattogoGomb = new PattogoGomb(shaderFennyel, tesztZold, nullptr, sphereKicsiGeometry, vec3(0, 1, 0), vec3(-4, 0, -5.2f), torusGeometry);
 
 	scene.SpherePos = guruloGomb->getPos();
 	
 
 	scene.AddObject(guruloGomb);
 	scene.AddObject(torus);
+	scene.AddObject(pattogoGomb);
 	
 
 	// Create objects by setting up their vertex data on the GPU

@@ -19,10 +19,9 @@ public:
 	{
 	}
 	Object(Shader * shader, Material* material, Texture * texture, Geometry* geometry,vec3 position)
-		:shader(shader), material(material), texture(texture), geometry(geometry)
+		:shader(shader), material(material), texture(texture), geometry(geometry), pos(position)
 	{
 		scale = vec3(1, 1, 1);
-		pos = vec3(0, 0, -5);
 		rotAxis = vec3(0, 1, 0);
 		rotAngle = 0;
 	}
@@ -153,17 +152,30 @@ class PattogoGomb : public Object {
 	const vec3 constPos; //Megegyezik a toruszeval! Es ehhez kepes megyunk meg balra jobbra!
 	Sphere* sphereGeometry;
 	mat4 rotateMatrix;
+	vec3 sebesseg;
 public:
 	PattogoGomb(Shader * shader, Material* material, Texture * texture, Sphere* geometry, vec3 rotAxis, vec3 pos, Torus* toruszGeometry)
 		: Object(shader, material, texture, geometry, pos),
 		toruszGeometry(toruszGeometry), constPos(pos), sphereGeometry(geometry)
 	{
-
+		sebesseg = vec3(0.5f, 0.5f, -1);
+		sebesseg.normalize();
 	}
 	vec3* getPos() { return &pos; }
 	void Animate(float dt)
 	{
-		
+		vec3 ujPos = pos + sebesseg * dt;
+		if (toruszGeometry->isPointInside(ujPos))
+			pos = ujPos;
+		else
+		{
+			vec3 bemenoIrany = sebesseg.normalize();
+			vec3 normal = toruszGeometry->getNormal(ujPos); ///ujPos vagy Pos
+			normal = normal.normalize();
+
+			vec3 ReflectDir = reflect(bemenoIrany, normal);
+			sebesseg = ReflectDir;
+		}
 	}
 	///TODO kommentezd ki ha normális forgatást akarsz
 	void Draw(RenderState state) {  //RenderState mi az a renderstate?
