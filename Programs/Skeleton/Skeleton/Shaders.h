@@ -39,14 +39,21 @@ class ShaderFennyel : public Shader
 	out vec3 wNormal;           // normal in world space
 	out vec3 wView;             // view in world space
 	out vec3 wLight;            // light dir in world space
+	
+	out vec4 wLightPos;
+	out vec4 wPos;
 
 	void main() {
 	   gl_Position = vec4(vtxPos, 1) * MVP; // to NDC
 
-	   vec4 wPos = vec4(vtxPos, 1) * M;
+	   wPos = vec4(vtxPos, 1) * M;
+	   wLightPos = wLiPos;
+	   
 	   wLight  = wLiPos.xyz * wPos.w - wPos.xyz * wLiPos.w;
 	   wView   = wEye * wPos.w - wPos.xyz;
 	   wNormal = (Minv * vec4(vtxNorm, 0)).xyz;
+	   
+	   
 	}
 )";
 
@@ -61,6 +68,9 @@ class ShaderFennyel : public Shader
 	uniform vec3 La, Le;    // ambient and point source rad
 	uniform float shine;    // shininess for specular ref
 
+	in vec4 wLightPos;
+	in vec4 wPos;
+	
 	in  vec3 wNormal;       // interpolated world sp normal
 	in  vec3 wView;         // interpolated world sp view
 	in  vec3 wLight;        // interpolated world sp illum dir
@@ -75,8 +85,13 @@ vec3 getColor()
 	   float cost = max(dot(N,L), 0);
 	   float cosd = max(dot(N,H), 0);
 	   
+	   vec4 lightDistance = wLightPos - wPos;
+	   float distance = length(lightDistance);
+	   
+	   vec3 Lee = Le / (distance*distance);
+	   
 	   vec3 color = ka * La + 
-				   (kd * cost + ks * pow(cosd,shine)) * Le;
+				   (kd * cost + ks * pow(cosd,shine)) * Lee;
 				   
 	   return color;
 }

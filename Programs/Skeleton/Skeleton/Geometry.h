@@ -74,7 +74,7 @@ class Sphere : public ParamSurface {
 public:
 	Sphere(vec3 c, float r) : center(c), radius(r) {
 		//Create(22, 15); // tessellation level
-		Create(10, 10); ///TODO ideiglenesen levéve
+		Create(22, 15); ///TODO ideiglenesen levéve
 	}
 
 	VertexData GenVertexData(float u, float v) {

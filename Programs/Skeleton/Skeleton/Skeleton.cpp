@@ -264,7 +264,7 @@ void onInitialization() {
 	shaderFennyel->createShader();
 
 	Material* tesztPiros = new Material(vec3(0.2f, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.4f, 0, 0.1f), 10, true, false);
-	Material* tesztKek = new Material(vec3(0.1f, 0.1f, 0.4f), vec3(0.1f, 0.1f, 0.5f), vec3(0.1f, 0.1f, 0.4f), 10, true, false);
+	Material* tesztKek = new Material(vec3(0.1f, 0.1f, 0.4f), vec3(0.1f, 0.1f, 0.5f), vec3(1, 1, 1), 10, true, false);
 
 	vec3 torusCenter = vec3(0, 0, -5);
 	Torus* torusGeometry = new Torus(1, 4);
