@@ -205,7 +205,7 @@ public:
 	vec3 *SpherePos;
 	///TODO megirni hogy inicializaljon mindent
 	Scene()
-		: camera(vec3(0,0,2),vec3(0,0,-1),vec3(0,1,0),90,0.1,13)
+		: camera(vec3(0,0,2),vec3(0,0,-1),vec3(0,1,0),90,0.1,10)
 	{
 		sebesseg = vec3(0, 0, 0);
 		//Torusba ha benne vagy ezt ne kommentezd ki
@@ -367,13 +367,13 @@ void onMouse(int button, int state, int pX, int pY) {
 		float cX = (2.0f * pX / windowWidth) - 1;	// flip y axis
 		float cY = 1.0f - (2.0f * pY / windowHeight);
 
-		float xAbs = fabs(cX);
-		float yAbs = fabs(cY);
-		float z = xAbs*yAbs;
+		float depth;
+		pY = windowHeight - pY; // Igy az origo a bal also sarokba lesz.
+		glReadPixels(pX, pY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
 
-		vec4 clickKoord(cX, cY, -z, 1.0f);
+		vec4 clickKoord(cX, cY, depth, 1.0f);
 
-		scene.convertClickCoord(clickKoord);
+		//scene.convertClickCoord(clickKoord);
 		
 		long time = glutGet(GLUT_ELAPSED_TIME); // elapsed time since the start of the program
 		float sec = time / 1000.0f;
