@@ -300,7 +300,7 @@ void onInitialization() {
 
 	scene.SpherePos = guruloGomb->getPos();
 	
-	PattogoLight* pattogoLight = new PattogoLight(vec4(-4, 0, -5.2f,1), vec3(1, 1, 1), vec3(1, 1, 1), torusGeometry);
+	PattogoLight* pattogoLight = new PattogoLight(vec4(-4, 0, -5.2f,1), vec3(1, 1, 1), vec3(1, 1, 1), torusGeometry,sphereKicsiGeometry);
 	Light* lightSima = new Light(vec4(-4, 0, -4), vec3(1, 1, 1), vec3(1,1,1));
 	scene.setLight1(pattogoLight);
 	scene.setLight2(lightSima);

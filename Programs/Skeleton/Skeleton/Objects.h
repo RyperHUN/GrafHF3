@@ -165,7 +165,8 @@ public:
 	void Animate(float dt)
 	{
 		vec3 ujPos = pos + sebesseg * dt;
-		if (toruszGeometry->isPointInside(ujPos))
+		float r = sphereGeometry->getRadius();
+		if (toruszGeometry->isPointInside(ujPos + sebesseg*r))
 			pos = ujPos;
 		else
 		{
