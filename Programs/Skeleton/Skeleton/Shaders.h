@@ -324,7 +324,7 @@ public:
 		//Toroljuk a shadereket - Mar hozzaadtuk a programhoz szoval mar nem kell
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
-	}
+	}//taln
 	void bindAttributes()
 	{
 		// Connect Attrib Arrays to input variables of the vertex shader
