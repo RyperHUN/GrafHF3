@@ -76,7 +76,7 @@ int majorVersion = 3, minorVersion = 0;
 ///TODO itt minden matrix
 // 2D camera
 struct Camera {
-	vec3  wEye, wLookat, wVup; ///Most akkor vec3???
+	vec3  wEye, wLookat, wVup;
 	float fov, asp, nearPlane, farPlane;
 
 	float wCx, wCy;	// center in world coordinates
@@ -107,11 +107,11 @@ public:
 		vec3 w = (wEye - wLookat).normalize();
 		vec3 u = cross(wVup, w).normalize();
 		vec3 v = cross(w, u);
-		return Translate(wEye.x, wEye.y, wEye.z) *
-			mat4(u.x, u.y, u.z, 0.0f,
-				v.x, v.y, v.z, 0.0f,
-				w.x, w.y, w.z, 0.0f,
-				0.0f, 0.0f, 0.0f, 1.0f);
+		return mat4(u.x, u.y, u.z, 0.0f,
+			v.x, v.y, v.z, 0.0f,
+			w.x, w.y, w.z, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f) * Translate(wEye.x, wEye.y, wEye.z);
+			
 	}
 	mat4 P() { // projection matrix
 		float sy = 1 / tan(fov / 2 * M_PI / 180);
@@ -243,6 +243,13 @@ public:
 		for (Object * obj : objects)
 			obj->forgatOnOff();
 	}
+	void convertClickCoord(vec4 clickCoord)
+	{
+		///Ezt hogy a francba??
+		GLfloat data[3];
+		glReadPixels(clickCoord.v[0], clickCoord.v[1], 1, 1, GL_RGB, GL_FLOAT, &data);
+		int i = 11;
+	}
 };
 
 Scene scene;
@@ -337,6 +344,10 @@ void onMouse(int button, int state, int pX, int pY) {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {  // GLUT_LEFT_BUTTON / GLUT_RIGHT_BUTTON and GLUT_DOWN / GLUT_UP
 		float cX = (2.0f * pX / windowWidth) - 1;	// flip y axis
 		float cY = 1.0f - (2.0f * pY / windowHeight);
+
+		vec4 clickKoord(cX, cY, 0.0f, 1.0f);
+
+		scene.convertClickCoord(clickKoord);
 		
 		long time = glutGet(GLUT_ELAPSED_TIME); // elapsed time since the start of the program
 		float sec = time / 1000.0f;
