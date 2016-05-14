@@ -291,8 +291,8 @@ void onInitialization() {
 	ShaderFennyel* shaderFennyel = new ShaderFennyel();
 	shaderFennyel->createShader();
 
-	Material* tesztPiros = new Material(vec3(0.4, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.5f, 0.5f, 0.5f), 1100, true, false);
-	Material* tesztZold = new Material(vec3(0, 0.5f, 0.1f), vec3(0.1f, 0.5f, 0.1f), vec3(0.1f, 0.5, 0.1f), 10, true, false);
+	Material* tesztPiros = new Material(vec3(0.4, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(1, 1, 1), 30, true, false);
+	Material* tesztCian = new Material(vec3(0, 0.5f, 0.5f), vec3(0, 0.4f, 0.4f), vec3(0, 0.4f, 0.4f), 10, true, false);
 	Material* tesztKek = new Material(vec3(0.1f, 0.1f, 0.4f), vec3(0.1f, 0.1f, 0.5f), vec3(1, 1, 1), 10, true, false);
 
 	vec3 torusCenter = vec3(0, 0, -5);
@@ -303,13 +303,13 @@ void onInitialization() {
 	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.4f);
 	//ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztKek,nullptr,sphereGeometry, vec3(0,1,0),vec3(-4,0,-5.3f));
 	ForgoGomb* guruloGomb = new ForgoGomb(shaderPhongTexture, tesztKek, nullptr, sphereGeometry, vec3(0, 1, 0), torusCenter,torusGeometry);
-	PattogoGomb* pattogoGomb = new PattogoGomb(shaderPhongTexture, tesztZold, nullptr, sphereKicsiGeometry, vec3(0, 1, 0), vec3(-4, 0, -5.2f), torusGeometry);
+	PattogoGomb* pattogoGomb = new PattogoGomb(shaderFennyel, tesztCian, nullptr, sphereKicsiGeometry, vec3(0, 1, 0), vec3(-4, 0, -5.2f), torusGeometry);
 
 	scene.SpherePos = guruloGomb->getPos();
 	
 	scene.setInsideGeometry(torusGeometry);
-	PattogoLight* pattogoLight = new PattogoLight(vec4(-4, 0, -5.2f,1), vec3(0.4f, 0.4f, 0.4f), vec3(1, 1, 1), torusGeometry,sphereKicsiGeometry);
-	Light* lightSima = new Light(vec4(-4, 0, -4), vec3(0.4f, 0.4f, 0.4f), vec3(0.2f,0.2f,0.2f));
+	PattogoLight* pattogoLight = new PattogoLight(vec4(-4, 0, -5.2f,1), vec3(0.4f, 0.4f, 0.4f), vec3(0, 1, 1), torusGeometry,sphereKicsiGeometry);
+	Light* lightSima = new Light(vec4(-4, 0, -4), vec3(0.4f, 0.4f, 0.4f), vec3(0.2f,0.2f,0)); ///TODO atrakni sargara (1,1,0)
 	scene.setLight1(pattogoLight);
 	scene.setLight2(lightSima);
 
