@@ -124,7 +124,7 @@ vec3 getColor()
 		color = color1 + color2;
 		color = color + 0*La2 + 0* Le2; //Kamu sor debugra
 		
-	   return color1;
+	   return color2;
 }
 
 	void main() {

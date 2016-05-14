@@ -205,6 +205,15 @@ public:
 	{
 		return sqrtf(v[0] * v[0] + v[1] * v[1]);
 	}
+	vec3 homogenOsztas()
+	{
+		vec3 ujpont;
+		ujpont.x = v[0] / v[3];
+		ujpont.y = v[1] / v[3];
+		ujpont.z = v[2] / v[3];
+
+		return ujpont;
+	}
 };
 
 vec4 operator*(float &szam, vec4& right)

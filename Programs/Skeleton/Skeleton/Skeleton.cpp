@@ -205,7 +205,7 @@ public:
 	vec3 *SpherePos;
 	///TODO megirni hogy inicializaljon mindent
 	Scene()
-		: camera(vec3(0,0,2),vec3(0,0,-1),vec3(0,1,0),90,0.1,10)
+		: camera(vec3(0,0,2),vec3(0,0,-1),vec3(0,1,0),90,0.2f,10)
 	{
 		sebesseg = vec3(0, 0, 0);
 		//Torusba ha benne vagy ezt ne kommentezd ki
@@ -249,12 +249,12 @@ public:
 	}
 	void convertClickCoord(vec4 clickCoord)
 	{
-		/*///Ezt hogy a francba??
-		GLfloat data[3];
-		glReadPixels(clickCoord.v[0], clickCoord.v[1], 1, 1, GL_RGB, GL_FLOAT, &data);
-		int i = 11;*/
-		sebesseg = vec3(clickCoord.v[0], clickCoord.v[1], clickCoord.v[2]);
-		sebesseg = sebesseg.normalize();
+		clickCoord = clickCoord * camera.Pinv();
+		clickCoord = clickCoord * camera.Vinv();
+		vec3 coord = clickCoord.homogenOsztas();
+
+		//sebesseg = vec3(clickCoord.v[0], clickCoord.v[1], clickCoord.v[2]);
+		//sebesseg = sebesseg.normalize();
 	}
 	void setLight1(Light *light)
 	{
@@ -370,10 +370,11 @@ void onMouse(int button, int state, int pX, int pY) {
 		float depth;
 		pY = windowHeight - pY; // Igy az origo a bal also sarokba lesz.
 		glReadPixels(pX, pY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+		float cZ = depth * 2 - 1;
 
-		vec4 clickKoord(cX, cY, depth, 1.0f);
+		vec4 clickKoord(cX, cY, cZ, 1.0f);
 
-		//scene.convertClickCoord(clickKoord);
+		scene.convertClickCoord(clickKoord);
 		
 		long time = glutGet(GLUT_ELAPSED_TIME); // elapsed time since the start of the program
 		float sec = time / 1000.0f;
