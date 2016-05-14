@@ -291,7 +291,7 @@ void onInitialization() {
 	ShaderFennyel* shaderFennyel = new ShaderFennyel();
 	shaderFennyel->createShader();
 
-	Material* tesztPiros = new Material(vec3(0.4, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.5f, 0.5f, 0.5f), 10, true, false);
+	Material* tesztPiros = new Material(vec3(0.4, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(0.5f, 0.5f, 0.5f), 1100, true, false);
 	Material* tesztZold = new Material(vec3(0, 0.5f, 0.1f), vec3(0.1f, 0.5f, 0.1f), vec3(0.1f, 0.5, 0.1f), 10, true, false);
 	Material* tesztKek = new Material(vec3(0.1f, 0.1f, 0.4f), vec3(0.1f, 0.1f, 0.5f), vec3(1, 1, 1), 10, true, false);
 
@@ -374,6 +374,9 @@ void onMouse(int button, int state, int pX, int pY) {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {  // GLUT_LEFT_BUTTON / GLUT_RIGHT_BUTTON and GLUT_DOWN / GLUT_UP
 		float cX = (2.0f * pX / windowWidth) - 1;	// flip y axis
 		float cY = 1.0f - (2.0f * pY / windowHeight);
+
+		float rgbInfo[3];
+		glReadPixels(pX, pY, 1, 1, GL_RGB, GL_FLOAT, &rgbInfo);
 
 		float depth;
 		pY = windowHeight - pY; // Igy az origo a bal also sarokba lesz.

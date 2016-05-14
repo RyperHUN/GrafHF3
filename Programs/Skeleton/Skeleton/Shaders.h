@@ -241,6 +241,9 @@ public:
 		glUniform3f(location, light->La.x, light->La.y, light->La.z);
 		location = getUniform("Le2");
 		glUniform3f(location, light->Le.x, light->Le.y, light->Le.z);
+
+		location = getUniform("shine");
+		glUniform1f(location, state.material->shininess);
 		//====================== FRAGMENT SHADER KESZ ================================//
 	}
 };
@@ -539,6 +542,9 @@ public:
 		location = getUniform("Le");
 		glUniform3f(location, light->Le.x, light->Le.y, light->Le.z);
 
+		location = getUniform("shine");
+		glUniform1f(location, state.material->shininess);
+
 		//if (state.texture != nullptr)
 		//{
 		//	int samplerUnit = GL_TEXTURE0; // GL_TEXTURE1, …
@@ -687,16 +693,22 @@ class ShaderPhongTexture : public Shader
 	vec3 getColor()
 	{
 		  
-		   vec3 color;
+		   
+		   vec3 color2 = getLight2DirectionColor();
+			color2 = colorNormalize(color2);
+			
 		   vec3 color1 = getLight1PositionColor();
 		   color1 = colorNormalize(color1);	   
 			
-			vec3 color2 = getLight2DirectionColor();
-			color2 = colorNormalize(color2);
 			
-			color = color1 + color2;
 			
-		   return color1;
+			vec3 color = color1 + color2;
+			
+			bvec3 lessthan = lessThan(color,vec3(1,0,0));
+			//if(lessthan.x == true)
+			//	return vec3(1,1,1);
+			
+		   return color;
 	}
 
 	void main() {
@@ -812,6 +824,9 @@ public:
 		glUniform3f(location, light->La.x, light->La.y, light->La.z);
 		location = getUniform("Le2");
 		glUniform3f(location, light->Le.x, light->Le.y, light->Le.z);
+
+		location = getUniform("shine");
+		glUniform1f(location, state.material->shininess);
 		//====================== FRAGMENT SHADER KESZ ================================//
 	}
 };
