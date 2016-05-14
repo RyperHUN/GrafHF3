@@ -281,6 +281,9 @@ void onInitialization() {
 	ShaderTextureTorus* shaderTexture = new ShaderTextureTorus();
 	shaderTexture->createShader();
 
+	ShaderPhongTexture* shaderPhongTexture = new ShaderPhongTexture();
+	shaderPhongTexture->createShader();
+
 	ShaderSzines* shaderSzines = new ShaderSzines();
 	shaderSzines->createShader();
 	shaderSzines->setColor(vec3(1, 0, 0));
@@ -294,12 +297,12 @@ void onInitialization() {
 
 	vec3 torusCenter = vec3(0, 0, -5);
 	Torus* torusGeometry = new Torus(1, 4,torusCenter);
-	ForgoObjektum* torus = new ForgoObjektum(shaderFennyel, tesztPiros, nullptr, torusGeometry, vec3(1, 0, 0), torusCenter);
+	ForgoObjektum* torus = new ForgoObjektum(shaderPhongTexture, tesztPiros, nullptr, torusGeometry, vec3(1, 0, 0), torusCenter);
 
 	Sphere* sphereKicsiGeometry = new Sphere(vec3(0, 0, 0), 0.05f, 10, 10);
 	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.4f);
 	//ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztKek,nullptr,sphereGeometry, vec3(0,1,0),vec3(-4,0,-5.3f));
-	ForgoGomb* guruloGomb = new ForgoGomb(shaderFennyel, tesztKek, nullptr, sphereGeometry, vec3(0, 1, 0), torusCenter,torusGeometry);
+	ForgoGomb* guruloGomb = new ForgoGomb(shaderPhongTexture, tesztKek, nullptr, sphereGeometry, vec3(0, 1, 0), torusCenter,torusGeometry);
 	PattogoGomb* pattogoGomb = new PattogoGomb(shaderFennyel, tesztZold, nullptr, sphereKicsiGeometry, vec3(0, 1, 0), vec3(-4, 0, -5.2f), torusGeometry);
 
 	scene.SpherePos = guruloGomb->getPos();
