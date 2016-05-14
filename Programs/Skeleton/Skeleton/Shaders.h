@@ -603,7 +603,8 @@ class ShaderPhongTexture : public Shader
 	#version 130
     	precision highp float;
 
-	uniform vec3 kd, ks, ka;// diffuse, specular, ambient ref
+	//uniform vec3 kd, ks, ka;// diffuse, specular, ambient ref
+	uniform vec3 ks;
 	uniform vec3 La, Le;    // ambient and point source rad
 	uniform vec3 La2, Le2;
 	uniform float shine;    // shininess for specular ref
@@ -673,8 +674,6 @@ class ShaderPhongTexture : public Shader
 	   vec3 textured = getTexture(texcoord);
 
 	   vec3 color1 = textured * La + (textured * cost + ks * pow(cosd,shine)) * Lee;
-	   
-	   vec3 kamuColor = ka * La * 0.0f + (kd * cost + ks * pow(cosd,shine)) * Lee * 0.0f; // Kamu sor debugra	
 	   
 	   return color1;
 	}
@@ -816,17 +815,17 @@ public:
 		//====================== VERTEX SHADER BETOLTVE ================================//
 		
 		//====================== FRAGMENT SHADER TOLTES ================================//
-		location = getUniform("kd");
-		vec3 kd = state.material->kd;
-		glUniform3f(location, kd.x, kd.y, kd.z);
+		//location = getUniform("kd");
+		//vec3 kd = state.material->kd;
+		//glUniform3f(location, kd.x, kd.y, kd.z);
 
 		location = getUniform("ks");
 		vec3 ks = state.material->ks;
 		glUniform3f(location, ks.x, ks.y, ks.z);
 
-		location = getUniform("ka");
-		vec3 ka = state.material->ka;
-		glUniform3f(location, ka.x, ka.y, ka.z);
+		//location = getUniform("ka");
+		//vec3 ka = state.material->ka;
+		//glUniform3f(location, ka.x, ka.y, ka.z);
 
 		//Feny
 		Light* light = state.light1;

@@ -277,6 +277,9 @@ void onInitialization() {
 	glViewport(0, 0, windowWidth, windowHeight);
 	glEnable(GL_DEPTH_TEST);
 
+	vec3 cianFenySebesseg(0.3f, 0.3f, -0.4f);
+	vec3 sargaFenySebesseg(-0.3f, 0.2f, -0.1f);
+
 	Texture * tesztTexture = new Texture();
 	ShaderTextureTorus* shaderTexture = new ShaderTextureTorus();
 	shaderTexture->createShader();
@@ -292,8 +295,9 @@ void onInitialization() {
 	shaderFennyel->createShader();
 
 	Material* tesztPiros = new Material(vec3(0.4, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(1, 1, 1), 30, true, false);
-	Material* tesztCian = new Material(vec3(0, 0.5f, 0.5f), vec3(0, 0.4f, 0.4f), vec3(0, 0.4f, 0.4f), 10, true, false);
-	Material* tesztKek = new Material(vec3(0.1f, 0.1f, 0.4f), vec3(0.1f, 0.1f, 0.5f), vec3(1, 1, 1), 10, true, false);
+	Material* tesztCian = new Material(vec3(0, 0.7f, 0.7f), vec3(0, 0.4f, 0.4f), vec3(0, 0.4f, 0.4f), 10, true, false);
+	Material* tesztSarga = new Material(vec3(0.7f, 0.7f, 0), vec3(0.4f, 0.4f, 0), vec3(0.4f, 0.4f, 0), 50, true, false);
+	Material* tesztKek = new Material(vec3(0.1f, 0.1f, 0.4f), vec3(0.1f, 0.1f, 0.5f), vec3(1, 1, 1), 30, true, false);
 
 	vec3 torusCenter = vec3(0, 0, -5);
 	Torus* torusGeometry = new Torus(1, 4,torusCenter);
@@ -303,22 +307,23 @@ void onInitialization() {
 	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.4f);
 	//ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztKek,nullptr,sphereGeometry, vec3(0,1,0),vec3(-4,0,-5.3f));
 	ForgoGomb* guruloGomb = new ForgoGomb(shaderPhongTexture, tesztKek, nullptr, sphereGeometry, vec3(0, 1, 0), torusCenter,torusGeometry);
-	PattogoGomb* pattogoGomb = new PattogoGomb(shaderFennyel, tesztCian, nullptr, sphereKicsiGeometry, vec3(0, 1, 0), vec3(-4, 0, -5.2f), torusGeometry);
+	PattogoGomb* pattogoGombCian = new PattogoGomb(shaderFennyel, tesztCian, nullptr, sphereKicsiGeometry, vec3(0, 1, 0), vec3(-4, 0, -5.2f), torusGeometry, cianFenySebesseg);
+	PattogoGomb* pattogoGombSarga = new PattogoGomb(shaderFennyel, tesztSarga, nullptr, sphereKicsiGeometry, vec3(0, 1, 0), vec3(-3.7f, 0, -4.0f), torusGeometry, sargaFenySebesseg);
 
 	scene.SpherePos = guruloGomb->getPos();
 	
 	scene.setInsideGeometry(torusGeometry);
-	PattogoLight* pattogoLight = new PattogoLight(vec4(-4, 0, -5.2f,1), vec3(0.4f, 0.4f, 0.4f), vec3(0, 1, 1), torusGeometry,sphereKicsiGeometry);
+	PattogoLight* pattogoLight = new PattogoLight(vec4(-4, 0, -5.2f,1), vec3(0.4f, 0.4f, 0.4f), vec3(0, 1, 1), cianFenySebesseg,torusGeometry,sphereKicsiGeometry);
 	//Light* lightSima = new Light(vec4(-4, 0, -4), vec3(0.4f, 0.4f, 0.4f), vec3(0.2f,0.2f,0)); ///TODO atrakni sargara (1,1,0)
-	PattogoLight* patogoLightSarga = new PattogoLight(vec4(-4, 0, -4), vec3(0.4f, 0.4f, 0.4f), vec3(0.4f, 0.4f, 0), torusGeometry, sphereKicsiGeometry);
+	PattogoLight* patogoLightSarga = new PattogoLight(vec4(-3.7f, 0, -4.0f,1), vec3(0.4f, 0.4f, 0.4f), vec3(0.4f, 0.4f, 0),sargaFenySebesseg, torusGeometry, sphereKicsiGeometry);
 	scene.setLight1(pattogoLight);
 	//scene.setLight2(lightSima);
 	scene.setLight2(patogoLightSarga);
 
 	scene.AddObject(guruloGomb);
 	scene.AddObject(torus);
-	scene.AddObject(pattogoGomb);
-	
+	scene.AddObject(pattogoGombSarga);
+	scene.AddObject(pattogoGombCian);
 
 	// Create objects by setting up their vertex data on the GPU
 }

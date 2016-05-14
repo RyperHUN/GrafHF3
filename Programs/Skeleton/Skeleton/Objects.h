@@ -154,12 +154,12 @@ class PattogoGomb : public Object {
 	mat4 rotateMatrix;
 	vec3 sebesseg;
 public:
-	PattogoGomb(Shader * shader, Material* material, Texture * texture, Sphere* geometry, vec3 rotAxis, vec3 pos, Torus* toruszGeometry)
+	PattogoGomb(Shader * shader, Material* material, Texture * texture, Sphere* geometry, vec3 rotAxis, vec3 pos, Torus* toruszGeometry,vec3 sebesseg)
 		: Object(shader, material, texture, geometry, pos),
 		toruszGeometry(toruszGeometry), constPos(pos), sphereGeometry(geometry)
 	{
-		sebesseg = vec3(0.3f, 0.3f, -0.4f);
-		sebesseg = sebesseg.normalize();
+		this->sebesseg = sebesseg;
+		this->sebesseg = sebesseg.normalize();
 	}
 	vec3* getPos() { return &pos; }
 	void Animate(float dt)

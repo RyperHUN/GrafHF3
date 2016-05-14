@@ -23,11 +23,11 @@ struct PattogoLight : public Light
 	vec3 pos;
 	Torus* toruszGeometry;
 	Sphere* sphereGeometry;
-	PattogoLight(vec4 wLightPos, vec3 La, vec3 Le,Torus* toruszGeometry,Sphere* sphereGeometry)
+	PattogoLight(vec4 wLightPos, vec3 La, vec3 Le,vec3 sebesseg,Torus* toruszGeometry,Sphere* sphereGeometry)
 		: Light(wLightPos,La,Le), toruszGeometry(toruszGeometry), sphereGeometry(sphereGeometry)
 	{
-		sebesseg = vec3(0.3f, 0.3f, -0.4f);
-		sebesseg = sebesseg.normalize();
+		this->sebesseg = sebesseg;
+		this->sebesseg = sebesseg.normalize();
 		pos = vec3(wLightPos.v[0], wLightPos.v[1], wLightPos.v[2]);
 	}
 	void Animate(float dt)
