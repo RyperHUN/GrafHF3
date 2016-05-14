@@ -309,9 +309,11 @@ void onInitialization() {
 	
 	scene.setInsideGeometry(torusGeometry);
 	PattogoLight* pattogoLight = new PattogoLight(vec4(-4, 0, -5.2f,1), vec3(0.4f, 0.4f, 0.4f), vec3(0, 1, 1), torusGeometry,sphereKicsiGeometry);
-	Light* lightSima = new Light(vec4(-4, 0, -4), vec3(0.4f, 0.4f, 0.4f), vec3(0.2f,0.2f,0)); ///TODO atrakni sargara (1,1,0)
+	//Light* lightSima = new Light(vec4(-4, 0, -4), vec3(0.4f, 0.4f, 0.4f), vec3(0.2f,0.2f,0)); ///TODO atrakni sargara (1,1,0)
+	PattogoLight* patogoLightSarga = new PattogoLight(vec4(-4, 0, -4), vec3(0.4f, 0.4f, 0.4f), vec3(0.4f, 0.4f, 0), torusGeometry, sphereKicsiGeometry);
 	scene.setLight1(pattogoLight);
-	scene.setLight2(lightSima);
+	//scene.setLight2(lightSima);
+	scene.setLight2(patogoLightSarga);
 
 	scene.AddObject(guruloGomb);
 	scene.AddObject(torus);

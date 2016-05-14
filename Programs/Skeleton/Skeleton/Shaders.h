@@ -577,6 +577,7 @@ class ShaderPhongTexture : public Shader
 	out vec3 wLight2;	
 
 	out vec4 wLightPos;
+	out vec4 wLightPos2;
 	out vec4 wPos;
 	
 	out vec2 texcoord;
@@ -586,6 +587,7 @@ class ShaderPhongTexture : public Shader
 
 	   wPos = vec4(vtxPos, 1) * M;
 	   wLightPos = wLiPos;
+	   wLightPos2 = wLiPos2;
 	   
 	   wLight  = wLiPos.xyz * wPos.w - wPos.xyz * wLiPos.w;
 	   wLight2 = wLiPos2.xyz * wPos.w - wPos.xyz * wLiPos2.w;
@@ -607,6 +609,7 @@ class ShaderPhongTexture : public Shader
 	uniform float shine;    // shininess for specular ref
 
 	in vec4 wLightPos;
+	in vec4 wLightPos2;
 	in vec4 wPos;
 	
 	in vec2 texcoord;
@@ -655,7 +658,6 @@ class ShaderPhongTexture : public Shader
 	}
 	vec3 getLight1PositionColor()
 	{
-		
 		vec3 N = normalize(wNormal);
 	   vec3 V = normalize(wView);  
 	   vec3 L = normalize(wLight);
@@ -690,11 +692,29 @@ class ShaderPhongTexture : public Shader
 			
 		return textured* La2 + (textured * cost2 + ks * pow(cosd2,shine)) * Le2;
 	}
+	vec3 getLight2PositionColor()
+	{
+		vec3 L2 = normalize(wLight2);
+		vec3 N2 = normalize(wNormal);
+		vec3 V2 = normalize(wView); 
+		vec3 H2 = normalize(L2 + V2);
+		float cost2 = max(dot(N2,L2), 0);
+		float cosd2 = max(dot(N2,H2), 0);
+	   
+	   vec4 lightDistance = wLightPos2 - wPos;
+	   float distance = length(lightDistance);
+	   
+	   vec3 Lee2 = Le2 / (distance*distance);
+	   
+	   vec3 textured = getTexture(texcoord);
+	   
+	   return textured* La2 + (textured * cost2 + ks * pow(cosd2,shine)) * Lee2;
+	}
 	vec3 getColor()
 	{
 		  
-		   
-		   vec3 color2 = getLight2DirectionColor();
+		    //vec3 color2 = getLight2DirectionColor();
+			vec3 color2 = getLight2PositionColor();
 			color2 = colorNormalize(color2);
 			
 		   vec3 color1 = getLight1PositionColor();
