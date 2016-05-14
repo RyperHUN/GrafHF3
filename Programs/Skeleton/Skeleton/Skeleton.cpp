@@ -78,6 +78,7 @@ int majorVersion = 3, minorVersion = 0;
 struct Camera {
 	vec3  wEye, wLookat, wVup;
 	float fov, asp, nearPlane, farPlane;
+	vec3 destination, velocity;
 
 	float wCx, wCy;	// center in world coordinates
 	float wWx, wWy;	// width and height in world coordinates
@@ -86,6 +87,9 @@ public:
 	Camera(vec3 wEye,vec3 wLookat,vec3 wVup,float fov,float nearPlane,float farPlane) 
 		: wEye(wEye),wLookat(wLookat),wVup(wVup),fov(fov),nearPlane(nearPlane),farPlane(farPlane)
 	{
+		destination = vec3(0, 0, 0);
+		velocity = vec3(0, 0, 0);
+
 		asp = 1;
 		isFollowing = false;
 	}
@@ -143,9 +147,9 @@ public:
 		wWx += x;
 		wWy += y;
 	}
-	void Animate(float dt,vec3 sebesseg) 
+	void Animate(float dt) 
 	{
-		wEye = wEye + sebesseg*dt;
+		wEye = wEye + velocity * dt;
 	}
 	void follow(vec3 SpherePos)
 	{
@@ -174,6 +178,13 @@ public:
 		}
 		else
 			glUniformMatrix4fv(location, 1, GL_TRUE, V());
+	}
+	void setSpidermanMove(vec3 destination)
+	{
+		destination = destination;
+		velocity = destination - wEye;
+		velocity = velocity.normalize();
+		velocity = velocity / 3.0f;
 	}
 	static void toggleFollow()
 	{
@@ -235,7 +246,7 @@ public:
 		for (Object * obj : objects) 
 			obj->Animate(dt);
 
-		camera.Animate(dt,sebesseg);
+		camera.Animate(dt);
 		camera.follow(*SpherePos);
 
 		light1->Animate(dt);
@@ -252,7 +263,7 @@ public:
 		clickCoord = clickCoord * camera.Pinv();
 		clickCoord = clickCoord * camera.Vinv();
 		vec3 coord = clickCoord.homogenOsztas();
-
+		camera.setSpidermanMove(coord);
 		//sebesseg = vec3(clickCoord.v[0], clickCoord.v[1], clickCoord.v[2]);
 		//sebesseg = sebesseg.normalize();
 	}
