@@ -272,15 +272,21 @@ public:
 
 Scene scene;
 
+vector<Light*> disposeFeny;
+vector<Shader*> disposeShader;
+vector<Material*> disposeMaterial;
+vector<Geometry*> disposeGeometry;
+vector<Object*> disposeObject;
+
+
 // Initialization, create an OpenGL context
 void onInitialization() {
 	glViewport(0, 0, windowWidth, windowHeight);
 	glEnable(GL_DEPTH_TEST);
 
 	vec3 cianFenySebesseg(0.3f, 0.3f, -0.4f);
-	vec3 sargaFenySebesseg(-0.3f, 0.2f, -0.1f);
+	vec3 sargaFenySebesseg(-0.3f, 0.2f, -0.05f);
 
-	Texture * tesztTexture = new Texture();
 	ShaderTextureTorus* shaderTexture = new ShaderTextureTorus();
 	shaderTexture->createShader();
 
@@ -314,16 +320,44 @@ void onInitialization() {
 	
 	scene.setInsideGeometry(torusGeometry);
 	PattogoLight* pattogoLight = new PattogoLight(vec4(-4, 0, -5.2f,1), vec3(0.4f, 0.4f, 0.4f), vec3(0, 1, 1), cianFenySebesseg,torusGeometry,sphereKicsiGeometry);
-	//Light* lightSima = new Light(vec4(-4, 0, -4), vec3(0.4f, 0.4f, 0.4f), vec3(0.2f,0.2f,0)); ///TODO atrakni sargara (1,1,0)
-	PattogoLight* patogoLightSarga = new PattogoLight(vec4(-3.7f, 0, -4.0f,1), vec3(0.4f, 0.4f, 0.4f), vec3(0.4f, 0.4f, 0),sargaFenySebesseg, torusGeometry, sphereKicsiGeometry);
+	Light* lightSima = new Light(vec4(-4, 0, -4), vec3(0.4f, 0.4f, 0.4f), vec3(0.2f,0.2f,0)); ///TODO atrakni sargara (1,1,0)
+	PattogoLight* pattogoLightSarga = new PattogoLight(vec4(-3.7f, 0, -4.0f,1), vec3(0.4f, 0.4f, 0.4f), vec3(0.4f, 0.4f, 0),sargaFenySebesseg, torusGeometry, sphereKicsiGeometry);
 	scene.setLight1(pattogoLight);
 	//scene.setLight2(lightSima);
-	scene.setLight2(patogoLightSarga);
+	scene.setLight2(pattogoLightSarga);
 
 	scene.AddObject(guruloGomb);
 	scene.AddObject(torus);
 	scene.AddObject(pattogoGombSarga);
 	scene.AddObject(pattogoGombCian);
+
+	//======================= Dispose ===============================//
+	//Objektumok
+	disposeObject.push_back(guruloGomb);
+	disposeObject.push_back(torus);
+	disposeObject.push_back(pattogoGombCian);
+	disposeObject.push_back(pattogoGombSarga);
+	//Light sources
+	disposeFeny.push_back(lightSima);
+	disposeFeny.push_back(pattogoLight);
+	disposeFeny.push_back(pattogoLightSarga);
+	//Shaders
+	disposeShader.push_back(shaderFennyel);
+	disposeShader.push_back(shaderTexture);
+	disposeShader.push_back(shaderPhongTexture);
+	disposeShader.push_back(shaderSzines);
+	disposeShader.push_back(shaderFennyel);
+	//Geometry
+	disposeGeometry.push_back(sphereGeometry);
+	disposeGeometry.push_back(torusGeometry);
+	disposeGeometry.push_back(sphereKicsiGeometry);
+	//Material
+	disposeMaterial.push_back(tesztPiros);
+	disposeMaterial.push_back(tesztCian);
+	disposeMaterial.push_back(tesztSarga);
+	disposeMaterial.push_back(tesztKek);
+
+
 
 	// Create objects by setting up their vertex data on the GPU
 }
@@ -334,6 +368,19 @@ void onInitialization() {
 //=============================== ====================================EVENTS===================================================================================/
 void onExit() {
 	//glDeleteProgram(shaderSzines->shaderProgram);
+
+	//Objektumok felszabaditasa!!
+	for (Object * obj : disposeObject)
+		delete obj;
+	for (Light * obj : disposeFeny)
+		delete obj;
+	for (Shader * obj : disposeShader)
+		delete obj;
+	for (Geometry * obj : disposeGeometry)
+		delete obj;
+	for (Material * obj : disposeMaterial)
+		delete obj;
+
 	printf("exit");
 }
 
