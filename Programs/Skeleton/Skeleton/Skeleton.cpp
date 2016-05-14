@@ -79,6 +79,7 @@ struct Camera {
 	vec3  wEye, wLookat, wVup;
 	float fov, asp, nearPlane, farPlane;
 	vec3 destination, velocity;
+	Torus * toruszGeometry;
 
 	float wCx, wCy;	// center in world coordinates
 	float wWx, wWy;	// width and height in world coordinates
@@ -147,9 +148,12 @@ public:
 		wWx += x;
 		wWy += y;
 	}
+	const float EPSILON = 0.50f; //Ezzel lehet allitani mennyire alljon meg messze a faltol
 	void Animate(float dt) 
 	{
-		wEye = wEye + velocity * dt;
+		vec3 ujPont = wEye + velocity * dt;
+		if (toruszGeometry->isPointInside(ujPont + velocity*EPSILON))
+			wEye = ujPont;
 	}
 	void follow(vec3 SpherePos)
 	{
@@ -160,24 +164,9 @@ public:
 		}
 
 	}
-	void loadProjViewMatrixes(int shaderProgram)
+	void setInsideGeometry(Torus* geometry)
 	{
-		int location = glGetUniformLocation(shaderProgram, "projection");
-		if (location < 0)
-		{
-			printf("uniform %s cannot be set\n", "projection");
-			throw "hibas lekeres"; // Ezt esetleg kivenni
-		}
-		else
-			glUniformMatrix4fv(location, 1, GL_TRUE, P());
-		location = glGetUniformLocation(shaderProgram, "view");
-		if (location < 0)
-		{
-			printf("uniform %s cannot be set\n", "projection");
-			throw "hibas lekeres"; // Ezt esetleg kivenni
-		}
-		else
-			glUniformMatrix4fv(location, 1, GL_TRUE, V());
+		toruszGeometry = geometry;
 	}
 	void setSpidermanMove(vec3 destination)
 	{
@@ -275,6 +264,10 @@ public:
 	{
 		this->light2 = light;
 	}
+	void setInsideGeometry(Torus* torus)
+	{
+		camera.setInsideGeometry(torus);
+	}
 };
 
 Scene scene;
@@ -311,6 +304,7 @@ void onInitialization() {
 
 	scene.SpherePos = guruloGomb->getPos();
 	
+	scene.setInsideGeometry(torusGeometry);
 	PattogoLight* pattogoLight = new PattogoLight(vec4(-4, 0, -5.2f,1), vec3(1, 1, 1), vec3(1, 1, 1), torusGeometry,sphereKicsiGeometry);
 	Light* lightSima = new Light(vec4(-4, 0, -4), vec3(1, 1, 1), vec3(1,1,1));
 	scene.setLight1(pattogoLight);
