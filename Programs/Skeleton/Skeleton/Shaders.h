@@ -647,45 +647,61 @@ class ShaderPhongTexture : public Shader
 			clr.z = 1.0f;
 		return clr;
 	}
+	vec3 getLight1PositionColor()
+	{
+		
+		vec3 N = normalize(wNormal);
+	   vec3 V = normalize(wView);  
+	   vec3 L = normalize(wLight);
+	   vec3 H = normalize(L + V);
+	   float cost = max(dot(N,L), 0);
+	   float cosd = max(dot(N,H), 0);
+	   
+	   vec4 lightDistance = wLightPos - wPos;
+	   float distance = length(lightDistance);
+	   
+	   vec3 Lee = Le / (distance*distance);
+	   
+	   vec3 textured = getTexture(texcoord);
+
+	   vec3 color1 = textured * La + (textured * cost + ks * pow(cosd,shine)) * Lee;
+	   
+	   vec3 kamuColor = ka * La * 0.0f + (kd * cost + ks * pow(cosd,shine)) * Lee * 0.0f; // Kamu sor debugra	
+	   
+	   return color1;
+	}
+	vec3 getLight2DirectionColor()
+	{
+		vec3 L2 = normalize(wLight2);
+		vec3 N2 = normalize(wNormal);
+		vec3 V2 = normalize(wView); 
+		vec3 H2 = normalize(L2 + V2);
+		
+		vec3 textured = getTexture(texcoord);
+		
+		float cost2 = max(dot(N2,L2), 0);
+		float cosd2 = max(dot(N2,H2), 0);
+			
+		return textured* La2 + (textured * cost2 + ks * pow(cosd2,shine)) * Le2;
+	}
 	vec3 getColor()
 	{
-		   vec3 N = normalize(wNormal);
-		   vec3 V = normalize(wView);  
-		   vec3 L = normalize(wLight);
-		   vec3 H = normalize(L + V);
-		   float cost = max(dot(N,L), 0);
-		   float cosd = max(dot(N,H), 0);
-		   
-		   vec4 lightDistance = wLightPos - wPos;
-		   float distance = length(lightDistance);
-		   
-		   vec3 Lee = Le / (distance*distance);
+		  
 		   vec3 color;
-		   vec3 color1 = ka * La + (kd * cost + ks * pow(cosd,shine)) * Lee;
-		   color = color + ka * La * 0.0f + (kd * cost + ks * pow(cosd,shine)) * Lee * 0.0f; // Kamu sor debugra	   
+		   vec3 color1 = getLight1PositionColor();
+		   color1 = colorNormalize(color1);	   
 			
-			vec3 L2 = normalize(wLight2);
-			vec3 N2 = normalize(wNormal);
-			vec3 V2 = normalize(wView); 
-			vec3 H2 = normalize(L2 + V2);
-			
-			color1 = colorNormalize(color1);
-			
-			float cost2 = max(dot(N2,L2), 0);
-			float cosd2 = max(dot(N2,H2), 0);
-			
-			vec3 color2 = ka* La2 + (kd * cost2 + ks * pow(cosd2,shine)) * Le2;
+			vec3 color2 = getLight2DirectionColor();
 			color2 = colorNormalize(color2);
 			
 			color = color1 + color2;
-			color = color + 0*La2 + 0* Le2; //Kamu sor debugra
 			
-		   return color;
+		   return color1;
 	}
 
 	void main() {
 	   vec3 color = getColor();
-	   color = getTexture(texcoord);
+	   //color = getTexture(texcoord);
 	   fragmentColor = vec4(color, 1);
 	}
 
