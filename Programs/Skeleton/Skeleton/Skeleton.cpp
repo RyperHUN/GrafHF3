@@ -82,10 +82,11 @@ struct Camera {
 
 	static bool isFollowing;
 
+	vec3 rugoNagysaga;
 	bool isClicked = false;
 	vec3 destination, velocity;
 	vec3 acceleration;
-	const float RUGOMEREVSEG = 1.5f;
+	const float RUGOMEREVSEG = 0.6f;
 public:
 	Camera(vec3 wEye,vec3 wLookat,vec3 wVup,float fov,float nearPlane,float farPlane) 
 		: wEye(wEye),wLookat(wLookat),wVup(wVup),fov(fov),nearPlane(nearPlane),farPlane(farPlane)
@@ -147,7 +148,7 @@ public:
 		this->wEye = wEyePos;
 		this->wLookat = lookAt;
 	}
-	const float EPSILON = 0.20f; //Ezzel lehet allitani mennyire alljon meg messze a faltol
+	const float EPSILON = 0.50f; //Ezzel lehet allitani mennyire alljon meg messze a faltol
 	//Ha van beallitva destination akkor arra megy a spiderman
 	void Animate(float dt) 
 	{
@@ -156,10 +157,13 @@ public:
 			acceleration = hookeTorveny();
 			velocity = velocity + acceleration * dt;
 			vec3 ujPont = wEye + velocity * dt;
-			if (toruszGeometry->isPointInside(ujPont + velocity*EPSILON))
+			vec3 normVelocity = velocity.normalize();
+			if (toruszGeometry->isPointInside(ujPont + normVelocity*EPSILON))
 			{
 				wEye = ujPont;
 			}
+			if (velocity.Length() > 0.0f && dot(velocity, rugoNagysaga) > 0.0f)
+				isClicked = false;
 		}
 	}
 	//Koveti a forgo gombot ha a space le volt nyomva
@@ -174,8 +178,9 @@ public:
 	}
 	vec3 hookeTorveny()
 	{
-		vec3 megnyulas = destination - wEye;
-		vec3 gyorsulas = megnyulas * RUGOMEREVSEG;
+		vec3 megnyulas = wEye - destination;
+		megnyulas = megnyulas - rugoNagysaga;
+		vec3 gyorsulas = megnyulas * -RUGOMEREVSEG;
 		return gyorsulas;
 	}
 	//Kamera mozgasanal ezen belul fog maradni!
@@ -188,6 +193,9 @@ public:
 	{
 		isClicked = true;
 		this->destination = destination;
+		rugoNagysaga = wEye - destination;
+		rugoNagysaga = rugoNagysaga.normalize() * 1.2f;
+
 		acceleration = hookeTorveny();
 		velocity = vec3(0, 0, 0);
 	}
