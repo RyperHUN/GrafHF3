@@ -78,14 +78,19 @@ int majorVersion = 3, minorVersion = 0;
 struct Camera {
 	vec3  wEye, wLookat, wVup;
 	float fov, asp, nearPlane, farPlane;
-	vec3 destination, velocity;
 	Torus * toruszGeometry;
 
 	static bool isFollowing;
+
+	bool isClicked = false;
+	vec3 destination, velocity;
+	vec3 acceleration;
+	const float RUGOMEREVSEG = 1.5f;
 public:
 	Camera(vec3 wEye,vec3 wLookat,vec3 wVup,float fov,float nearPlane,float farPlane) 
 		: wEye(wEye),wLookat(wLookat),wVup(wVup),fov(fov),nearPlane(nearPlane),farPlane(farPlane)
 	{
+		acceleration = vec3(0, 0, 0);
 		destination = vec3(0, 0, 0);
 		velocity = vec3(0, 0, 0);
 
@@ -142,13 +147,20 @@ public:
 		this->wEye = wEyePos;
 		this->wLookat = lookAt;
 	}
-	const float EPSILON = 0.50f; //Ezzel lehet allitani mennyire alljon meg messze a faltol
+	const float EPSILON = 0.20f; //Ezzel lehet allitani mennyire alljon meg messze a faltol
 	//Ha van beallitva destination akkor arra megy a spiderman
 	void Animate(float dt) 
 	{
-		vec3 ujPont = wEye + velocity * dt;
-		if (toruszGeometry->isPointInside(ujPont + velocity*EPSILON))
-			wEye = ujPont;
+		if (isClicked)
+		{
+			acceleration = hookeTorveny();
+			velocity = velocity + acceleration * dt;
+			vec3 ujPont = wEye + velocity * dt;
+			if (toruszGeometry->isPointInside(ujPont + velocity*EPSILON))
+			{
+				wEye = ujPont;
+			}
+		}
 	}
 	//Koveti a forgo gombot ha a space le volt nyomva
 	void follow(vec3 SpherePos)
@@ -160,6 +172,12 @@ public:
 		}
 
 	}
+	vec3 hookeTorveny()
+	{
+		vec3 megnyulas = destination - wEye;
+		vec3 gyorsulas = megnyulas * RUGOMEREVSEG;
+		return gyorsulas;
+	}
 	//Kamera mozgasanal ezen belul fog maradni!
 	void setInsideGeometry(Torus* geometry)
 	{
@@ -168,10 +186,10 @@ public:
 	//Beallitja hogy merre menjen a kamera amikor kilovi a kotelet.
 	void setSpidermanMove(vec3 destination)
 	{
-		destination = destination;
-		velocity = destination - wEye;
-		velocity = velocity.normalize();
-		velocity = velocity / 1.0f; //Ez allitja hogy milyen gyors legyen a spiderman kotele
+		isClicked = true;
+		this->destination = destination;
+		acceleration = hookeTorveny();
+		velocity = vec3(0, 0, 0);
 	}
 	//Space gomb lenyomasaval bekapcsolhatjuk a forgo golyo koveteset
 	static void toggleFollow()
@@ -188,12 +206,11 @@ class Scene {
 	Light* light1;
 	Light* light2;
 	RenderState state;
-	vec3 sebesseg;
+
 public:
 	Scene()
 		: camera(vec3(0,0,2),vec3(0,0,-1),vec3(0,1,0),90,0.2f,10)
 	{
-		sebesseg = vec3(0, 0, 0);
 		//Torusba ha benne vagy ezt ne kommentezd ki
 		vec3 campos(-4, 0, -4);
 		//campos = vec3(0, 2, 4);
