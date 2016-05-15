@@ -28,16 +28,18 @@ struct PattogoLight : public Light
 	{
 		this->sebesseg = sebesseg;
 		this->sebesseg = sebesseg.normalize();
+		///TODO v[3] al leosztani
 		pos = vec3(wLightPos.v[0], wLightPos.v[1], wLightPos.v[2]);
 	}
 	void Animate(float dt)
 	{
 		vec3 ujPos = pos + sebesseg * dt;
 		float r = sphereGeometry->getRadius();
+		//Megnezi hogy az uj pozicio + sugarral benne van-e meg a toruszban
 		if (toruszGeometry->isPointInside(ujPos + sebesseg*r))
-			pos = ujPos;
-		else
-		{
+			pos = ujPos; //ha igen uj pos
+		else 
+		{  //Ha nincs benne akkor a sugarkovetes analogia alapjan reflect irányban megy tovább ( maxwell törvények, ugyanakkora szögben verõdik vissza mint amibe bejött)
 			vec3 bemenoIrany = sebesseg.normalize();
 			vec3 normal = toruszGeometry->getNormal(ujPos); ///ujPos vagy Pos
 			normal = normal.normalize();
@@ -45,7 +47,7 @@ struct PattogoLight : public Light
 			vec3 ReflectDir = reflect(bemenoIrany, normal);
 			sebesseg = ReflectDir;
 		}
-		wLightPos = vec4(pos.x, pos.y, pos.z, 1);
+		wLightPos = vec4(pos.x, pos.y, pos.z, 1); //Visszakonvertalas meg a feny pozicioja vec4
 	}
 };
 
@@ -55,7 +57,6 @@ struct RenderState {
 	Texture* texture;
 	Light* light1;
 	Light* light2;
-	///TODO light?? esetleg pointer
 	vec3 wEye;
 	RenderState() 
 	{

@@ -81,8 +81,6 @@ struct Camera {
 	vec3 destination, velocity;
 	Torus * toruszGeometry;
 
-	float wCx, wCy;	// center in world coordinates
-	float wWx, wWy;	// width and height in world coordinates
 	static bool isFollowing;
 public:
 	Camera(vec3 wEye,vec3 wLookat,vec3 wVup,float fov,float nearPlane,float farPlane) 
@@ -137,24 +135,22 @@ public:
 			0.0f, 0.0f, 0, 1/beta,
 			0.0f, 0.0f, -1, alfa/beta);
 	}
-
+	//FONTOS !!!! lookAt nek relativnak kell lennie a szemhez
+	// lookAt = wEyePos + lookAt!
 	void setCenter(vec3 wEyePos, vec3 lookAt)
 	{
 		this->wEye = wEyePos;
 		this->wLookat = lookAt;
 	}
-	void increaseScale(float x = 0, float y = 0)
-	{
-		wWx += x;
-		wWy += y;
-	}
 	const float EPSILON = 0.50f; //Ezzel lehet allitani mennyire alljon meg messze a faltol
+	//Ha van beallitva destination akkor arra megy a spiderman
 	void Animate(float dt) 
 	{
 		vec3 ujPont = wEye + velocity * dt;
 		if (toruszGeometry->isPointInside(ujPont + velocity*EPSILON))
 			wEye = ujPont;
 	}
+	//Koveti a forgo gombot ha a space le volt nyomva
 	void follow(vec3 SpherePos)
 	{
 		if (isFollowing)
@@ -164,17 +160,20 @@ public:
 		}
 
 	}
+	//Kamera mozgasanal ezen belul fog maradni!
 	void setInsideGeometry(Torus* geometry)
 	{
 		toruszGeometry = geometry;
 	}
+	//Beallitja hogy merre menjen a kamera amikor kilovi a kotelet.
 	void setSpidermanMove(vec3 destination)
 	{
 		destination = destination;
 		velocity = destination - wEye;
 		velocity = velocity.normalize();
-		velocity = velocity / 3.0f;
+		velocity = velocity / 1.0f; //Ez allitja hogy milyen gyors legyen a spiderman kotele
 	}
+	//Space gomb lenyomasaval bekapcsolhatjuk a forgo golyo koveteset
 	static void toggleFollow()
 	{
 		isFollowing = !isFollowing;
@@ -183,27 +182,14 @@ public:
 bool Camera::isFollowing = false;
 //2D camera
 
-
-
-
-
-
-
-
-
-
-
-
 class Scene {
 	Camera camera;
-	vector<Object *> objects;
+	vector<Object *> objects; //Ebbe vannak a megjelenitendo objektumok
 	Light* light1;
 	Light* light2;
 	RenderState state;
 	vec3 sebesseg;
 public:
-	vec3 *SpherePos;
-	///TODO megirni hogy inicializaljon mindent
 	Scene()
 		: camera(vec3(0,0,2),vec3(0,0,-1),vec3(0,1,0),90,0.2f,10)
 	{
@@ -211,9 +197,6 @@ public:
 		//Torusba ha benne vagy ezt ne kommentezd ki
 		vec3 campos(-4, 0, -4);
 		//campos = vec3(0, 2, 4);
-
-		vec4 lightPos(campos.x, campos.y, campos.z);
-		
 		
 		camera.setCenter(campos,campos + vec3(0,0,-1) );
 	}
@@ -230,7 +213,7 @@ public:
 		for (Object * obj : objects) 
 			obj->Draw(state);
 	}
-
+	vec3 *SpherePos; //Kamera tudja hogy mit kell kovetni!
 	void Animate(float dt) {
 		for (Object * obj : objects) 
 			obj->Animate(dt);
@@ -242,19 +225,19 @@ public:
 		light2->Animate(dt);
 		
 	}
+	//A forgathato objektumoknal be/ki kapcsolja a forgatast
 	void forgatOnOff()
 	{
 		for (Object * obj : objects)
 			obj->forgatOnOff();
 	}
-	void convertClickCoord(vec4 clickCoord)
+	//cCoord - Clipping - Normalizalt eszkoz koordinataban a koordinatak
+	void convertClickCoord(vec4 cCoord)
 	{
-		clickCoord = clickCoord * camera.Pinv();
-		clickCoord = clickCoord * camera.Vinv();
-		vec3 coord = clickCoord.homogenOsztas();
+		cCoord = cCoord * camera.Pinv(); //Pipelineon visszajutas
+		cCoord = cCoord * camera.Vinv();
+		vec3 coord = cCoord.homogenOsztas();
 		camera.setSpidermanMove(coord);
-		//sebesseg = vec3(clickCoord.v[0], clickCoord.v[1], clickCoord.v[2]);
-		//sebesseg = sebesseg.normalize();
 	}
 	void setLight1(Light *light)
 	{
@@ -300,10 +283,10 @@ void onInitialization() {
 	ShaderFennyel* shaderFennyel = new ShaderFennyel();
 	shaderFennyel->createShader();
 
-	Material* tesztPiros = new Material(vec3(0.4, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(1, 1, 1), 30, true, false);
-	Material* tesztCian = new Material(vec3(0, 0.7f, 0.7f), vec3(0, 0.4f, 0.4f), vec3(0, 0.4f, 0.4f), 10, true, false);
-	Material* tesztSarga = new Material(vec3(0.7f, 0.7f, 0), vec3(0.4f, 0.4f, 0), vec3(0.4f, 0.4f, 0), 50, true, false);
-	Material* tesztKek = new Material(vec3(0.1f, 0.1f, 0.4f), vec3(0.1f, 0.1f, 0.5f), vec3(1, 1, 1), 30, true, false);
+	Material* tesztPiros = new Material(vec3(0.4, 0.1f, 0.1f), vec3(0.4f, 0.1f, 0.1f), vec3(1, 1, 1), 30);
+	Material* tesztCian = new Material(vec3(0, 0.7f, 0.7f), vec3(0, 0.4f, 0.4f), vec3(0, 0.4f, 0.4f), 10);
+	Material* tesztSarga = new Material(vec3(0.7f, 0.7f, 0), vec3(0.4f, 0.4f, 0), vec3(0.4f, 0.4f, 0), 50);
+	Material* tesztKek = new Material(vec3(0.1f, 0.1f, 0.4f), vec3(0.1f, 0.1f, 0.5f), vec3(1, 1, 1), 30);
 
 	vec3 torusCenter = vec3(0, 0, -5);
 	Torus* torusGeometry = new Torus(1, 4,torusCenter);
@@ -320,7 +303,7 @@ void onInitialization() {
 	
 	scene.setInsideGeometry(torusGeometry);
 	PattogoLight* pattogoLight = new PattogoLight(vec4(-4, 0, -5.2f,1), vec3(0.4f, 0.4f, 0.4f), vec3(0, 1, 1), cianFenySebesseg,torusGeometry,sphereKicsiGeometry);
-	Light* lightSima = new Light(vec4(-4, 0, -4), vec3(0.4f, 0.4f, 0.4f), vec3(0.2f,0.2f,0)); ///TODO atrakni sargara (1,1,0)
+	Light* lightSima = new Light(vec4(-4, 0, -4), vec3(0.4f, 0.4f, 0.4f), vec3(0.2f,0.2f,0)); 
 	PattogoLight* pattogoLightSarga = new PattogoLight(vec4(-3.7f, 0, -4.0f,1), vec3(0.4f, 0.4f, 0.4f), vec3(0.4f, 0.4f, 0),sargaFenySebesseg, torusGeometry, sphereKicsiGeometry);
 	scene.setLight1(pattogoLight);
 	//scene.setLight2(lightSima);
@@ -437,6 +420,7 @@ void onMouse(int button, int state, int pX, int pY) {
 		glReadPixels(pX, pY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
 		float cZ = depth * 2 - 1;
 
+		///c? - Clipping Space koordinatak - Ekkor vagyunk az egysegnegyzetbe
 		vec4 clickKoord(cX, cY, cZ, 1.0f);
 
 		scene.convertClickCoord(clickKoord);

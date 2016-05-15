@@ -57,30 +57,33 @@ public:
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)sVec3);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(2 * sVec3));
-		delete[] vtxData; ///Szivargas volt a dian levo kodba enyje benyje
+		delete[] vtxData; //Szivargas volt a dian levo kodba enyje benyje
 	}
+	//Parameteres feluleteknek kell csak GenVertexData(u,v), hiszen ezeknek tudjuk paraméterezni az egyenletet
+	//Egy poligonhalonak nem kell ilyen, ott fix haromszögek vannak.
 	virtual VertexData GenVertexData(float u, float v) = 0;
-	///TODO ez a hierarhiában lehet feljebb is mehet
 	void Draw() {
 		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, nVtx);
 	}
 };
 
-///TODO itt mar nem virtualisak a fuggvenyek
+
 class Sphere : public ParamSurface {
 	vec3 center;
 	float radius;
 public:
-	Sphere(vec3 c, float r) : center(c), radius(r) {
-		//Create(22, 15); // tessellation level
-		Create(22, 15); ///TODO ideiglenesen levéve
+	//Sima 22,15 ös szinten tesszellál ( bontja háromszögekre)
+	Sphere(vec3 c, float r) 
+		: center(c), radius(r) 
+	{
+		Create(22, 15); 
 	}
+	//Tetszoleges tesszellacio megadhato a konstruktorban.
 	Sphere(vec3 c, float r, int tessLevel1,int tessLevel2 ) 
 		: center(c), radius(r) 
 	{
-		//Create(22, 15); // tessellation level
-		Create(tessLevel1, tessLevel2); ///TODO ideiglenesen levéve
+		Create(tessLevel1, tessLevel2);
 	}
 
 	VertexData GenVertexData(float u, float v) {
@@ -93,19 +96,23 @@ public:
 		return vd;
 	}
 	float getRadius() { return radius; }
-
-	vec3 getSzogsebesseg(vec3 const& sebesseg)
+	//Atkonvertalja a test tangencialis sebesseget szogsebessegge
+	//Eredmenykeppen egy vec3 at ad, aminek a nagysaga megadja hogy 1 másodperc alatt hány radiánt forogna
+	// omega = v/r;
+	float getSzogsebesseg(vec3 const& sebesseg)
 	{
 		vec3 modif = sebesseg;
-		return modif *  (1 / radius);
+		modif = modif / radius;
+		return modif.Length();
 	}
 };
 
 class Torus : public ParamSurface {
 	vec3 center;
-	float radiusTorus;
-	float radiusFromCenter;
-	const bool insideTorus = true;
+	float radiusTorus;       float const& r = radiusTorus;
+	float radiusFromCenter;  float const& R = radiusFromCenter;
+
+	const bool insideTorus = true; //Ezzel a valtozoval allithato hogy a toruszt kivulrol vagy belulrol akarjuk nezni.
 public:
 	Torus(float radiusTorus, float radiusFromCenter,vec3 center) 
 		: radiusTorus(radiusTorus), radiusFromCenter(radiusFromCenter), center(center)
@@ -115,8 +122,6 @@ public:
 	//Normal vektor az implicit egyenlet gradiense lesz!
 	VertexData GenVertexData(float u, float v) {
 		VertexData vd;
-		float R = radiusFromCenter;
-		float r = radiusTorus;
 
 		float x = (R + r*cos(2 * M_PI*u))*cos(2 * M_PI*v);
 		float y = r*sin(2 * M_PI*u);
@@ -134,12 +139,11 @@ public:
 		vd.u = u; vd.v = v;
 		return vd;
 	}
-
+	//A parameteres felulet parcialis derivaltjai kellenek, és ezeket össze kell adni hogy megkapjuk a sebesseget
 	vec3 GetSebesseg(float u, float v, float dudt, float dvdt)
 	{
-		float R = radiusFromCenter;
-		float r = radiusTorus;
 		//Sebesseg kiszamol
+		
 		float X_du = -2 * M_PI* r *cos(2 * M_PI* v) *sin(2 * M_PI *u);
 		float X_dv = -2 * M_PI* (R + r *cos(2 * M_PI* u)) *sin(2 * M_PI* v);
 
@@ -156,24 +160,24 @@ public:
 		return elkeszult;
 	}
 	vec3 getCenter() { return center; }
+	//A gomb pattogasahoz, es a spiderman szovet lovesehez
+	//A lenyeg hogy az egyenletbe behelyettesitve ha negatív az elõjel akkor benne vagyunk, ha pozitív akkor kívül.
 	bool isPointInside(vec3 const& point)
 	{
-		float R = radiusFromCenter;
-		float r = radiusTorus;
-		vec3 torusRelativePoint = point - center;
+		// Ez azért kell mert el lehet tolva a Torus. ( Minv el is lehetne szorozni de ez egyszerubb )
+		// A torusz implicit egyenletebe pedig csak a referencia helyzetben helyettesithetunk be.
+		vec3 torusRelativePoint = point - center; 
 		float x = torusRelativePoint.x;
 		float y = torusRelativePoint.y;
 		float z = torusRelativePoint.z;
-
 
 		float eredmeny = powf((R - sqrt(x*x + z*z)),2) + y*y - r*r;
 
 		return eredmeny < 0;
 	}
+	//Implicit egyenletbol derivalassal megkapott sebesseg
 	vec3 getNormal(vec3 point)
 	{
-		float R = radiusFromCenter;
-		float r = radiusTorus;
 		vec3 torusRelativePoint = point - center;
 		float x = torusRelativePoint.x;
 		float y = torusRelativePoint.y;

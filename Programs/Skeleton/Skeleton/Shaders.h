@@ -1,6 +1,8 @@
 #pragma once
 
 #include "RenderState_Light.h"
+
+///TODO KIKOMMENTEZNI AZ OSSZESET!!!
 class Shader
 {
 public:
