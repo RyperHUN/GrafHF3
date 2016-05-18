@@ -87,6 +87,7 @@ struct Camera {
 	vec3 destination, velocity;
 	vec3 acceleration;
 	const float RUGOMEREVSEG = 0.6f;
+	KilottHalo* halo;
 public:
 	Camera(vec3 wEye,vec3 wLookat,vec3 wVup,float fov,float nearPlane,float farPlane) 
 		: wEye(wEye),wLookat(wLookat),wVup(wVup),fov(fov),nearPlane(nearPlane),farPlane(farPlane)
@@ -161,6 +162,7 @@ public:
 			if (toruszGeometry->isPointInside(ujPont + normVelocity*EPSILON))
 			{
 				wEye = ujPont;
+				halo->setNewMagassag(wEye, destination);
 			}
 			if (velocity.Length() > 0.0f && dot(velocity, rugoNagysaga) > 0.0f)
 				isClicked = false;
@@ -198,12 +200,15 @@ public:
 
 		acceleration = hookeTorveny();
 		velocity = vec3(0, 0, 0);
+
+		halo->addNewHalo(wEye, destination);
 	}
 	//Space gomb lenyomasaval bekapcsolhatjuk a forgo golyo koveteset
 	static void toggleFollow()
 	{
 		isFollowing = !isFollowing;
 	}
+	void setHalo(KilottHalo* halo) { this->halo = halo; }
 };
 bool Camera::isFollowing = false;
 //2D camera
@@ -214,7 +219,6 @@ class Scene {
 	Light* light1;
 	Light* light2;
 	RenderState state;
-
 public:
 	Scene()
 		: camera(vec3(0,0,2),vec3(0,0,-1),vec3(0,1,0),90,0.2f,10)
@@ -263,6 +267,8 @@ public:
 		cCoord = cCoord * camera.Vinv();
 		vec3 coord = cCoord.homogenOsztas();
 		camera.setSpidermanMove(coord);
+
+
 	}
 	void setLight1(Light *light)
 	{
@@ -276,6 +282,7 @@ public:
 	{
 		camera.setInsideGeometry(torus);
 	}
+	void setHalo(KilottHalo* halo) { camera.setHalo(halo); }
 };
 
 Scene scene;
@@ -342,6 +349,7 @@ void onInitialization() {
 	///NEW OBJ
 	Cylinder* cylinder = new Cylinder(0.3f, 1);
 	KilottHalo* cylinderTest = new KilottHalo(shaderFennyel, tesztCian, nullptr, cylinder, vec3(-4.4f, 0, -6));
+	scene.setHalo(cylinderTest);
 	scene.AddObject(cylinderTest);
 
 	//======================= Dispose ===============================//

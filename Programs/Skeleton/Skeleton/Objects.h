@@ -172,7 +172,8 @@ public:
 
 class KilottHalo : public Object {
 	const vec3 initDir;
-    const float haloszelesseg = 0.1f;
+    const float haloszelesseg = 0.05f;
+	float haloKezdoMagassag;
 public:
 	KilottHalo(Shader * shader, Material* material, Texture * texture, Geometry* geometry, vec3 position)
 		:Object(shader, material, texture, geometry, position), initDir(0.0f, 0.0f, -1.0f)
@@ -191,10 +192,20 @@ public:
 		vec3 normToDestination = toDestination.normalize();
 
 		rotAxis = cross(normToDestination, initDir);
-		rotAngle = acosf(dot(normToDestination, initDir));
+		rotAngle = -1* acosf(dot(normToDestination, initDir));
 		//Kesz beallitva
 		float tavolsag = toDestination.Length();
 
 		this->geometry = new Cylinder(haloszelesseg, tavolsag);
+		this->pos = to;//Beallitja a henger poziciojat megfelelo helyre
+		haloKezdoMagassag = toDestination.Length();
+	}
+	void setNewMagassag(vec3 from, vec3 to)
+	{
+		vec3 tavolsag = to - from;
+		float mostaniMagassag = tavolsag.Length();
+
+		float mostaniScale = mostaniMagassag / haloKezdoMagassag;
+		scale.z = mostaniScale;
 	}
 };
