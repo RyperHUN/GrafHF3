@@ -642,23 +642,6 @@ class ShaderPhongTexture : public Shader
 			temp_color.y = 0;
 				return temp_color;
 	}
-	vec3 colorNormalize(vec3 clr)
-	{
-		if(clr.x <= 0)
-			clr.x = 0.1f;
-		if(clr.y <= 0)
-			clr.y = 0.1f;
-		if(clr.z <= 0)
-			clr.z = 0.1f;
-		
-		if(clr.x > 1.0f)
-			clr.x = 1.0f;
-		if(clr.y > 1.0f)
-			clr.y = 1.0f;
-		if(clr.z > 1.0f)
-			clr.z = 1.0f;
-		return clr;
-	}
 	vec3 getLight1PositionColor()
 	{
 		vec3 N = normalize(wNormal);
@@ -716,10 +699,8 @@ class ShaderPhongTexture : public Shader
 		  
 		    //vec3 color2 = getLight2DirectionColor();
 			vec3 color2 = getLight2PositionColor();
-			color2 = colorNormalize(color2);
 			
-		   vec3 color1 = getLight1PositionColor();
-		   color1 = colorNormalize(color1);	   
+		   vec3 color1 = getLight1PositionColor();  
 			
 			
 			
