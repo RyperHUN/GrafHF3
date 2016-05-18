@@ -169,3 +169,32 @@ public:
 		}
 	}
 };
+
+class KilottHalo : public Object {
+	const vec3 initDir;
+    const float haloszelesseg = 0.1f;
+public:
+	KilottHalo(Shader * shader, Material* material, Texture * texture, Geometry* geometry, vec3 position)
+		:Object(shader, material, texture, geometry, position), initDir(0.0f, 0.0f, -1.0f)
+	{
+		scale = vec3(1, 1, 1);
+		rotAxis = vec3(0, 1, 0);
+		rotAngle = 0;
+	}
+	
+	void addNewHalo(vec3 from, vec3 to)
+	{
+		if (geometry != nullptr) //Az osztaly felelos a geometry beállításáért
+			delete geometry;
+		//Bealit jo iranyba
+		vec3 toDestination = to - from;
+		vec3 normToDestination = toDestination.normalize();
+
+		rotAxis = cross(normToDestination, initDir);
+		rotAngle = acosf(dot(normToDestination, initDir));
+		//Kesz beallitva
+		float tavolsag = toDestination.Length();
+
+		this->geometry = new Cylinder(haloszelesseg, tavolsag);
+	}
+};

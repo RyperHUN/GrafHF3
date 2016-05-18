@@ -340,8 +340,8 @@ void onInitialization() {
 	scene.AddObject(pattogoGombCian);
 
 	///NEW OBJ
-	Cylinder* cylinder = new Cylinder(0.4f, 1);
-	ForgoObjektum* cylinderTest = new ForgoObjektum(shaderFennyel,tesztPiros,nullptr,cylinder,vec3(0,1,0),vec3(-4.5f,0,-6));
+	Cylinder* cylinder = new Cylinder(0.3f, 1);
+	KilottHalo* cylinderTest = new KilottHalo(shaderFennyel, tesztCian, nullptr, cylinder, vec3(-4.4f, 0, -6));
 	scene.AddObject(cylinderTest);
 
 	//======================= Dispose ===============================//
