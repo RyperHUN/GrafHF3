@@ -193,3 +193,43 @@ public:
 		return normal;
 	}
 };
+//Cylinder - Henger
+class Cylinder : public ParamSurface{
+	float R;
+	float magassag;
+public:
+	Cylinder(float R, float magassag)
+		: R(R),magassag(magassag)
+	{
+		Create(22, 15); // tessellation level
+	}
+	VertexData GenVertexData(float u, float v) {
+		VertexData vd;
+
+		float x = R *cos(2*M_PI*u);
+		float y = R *sin(2*M_PI*u);
+		float z = magassag *v;
+
+		float Xddu = -2 * M_PI*R*sin(2 * M_PI*u);
+		float Xddv = 0;
+
+		float Yddu = 2 * M_PI*R*cos(2 * M_PI*u);
+		float Yddv = 0;
+
+		float Zddu = 0;
+		float Zddv = magassag;
+
+		vec3 normalU(Xddu, Yddu, Zddu);
+		vec3 normalV(Xddv, Yddv, Zddv);
+		vec3 normal = cross(normalU, normalV);
+
+		vec3 pos(x, y, z);
+
+		vd.position = pos;
+		vd.normal = normal;
+		vd.u = u;
+		vd.v = v;
+
+		return vd;
+	}
+};
