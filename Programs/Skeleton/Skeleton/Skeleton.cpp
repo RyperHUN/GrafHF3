@@ -319,6 +319,7 @@ void onInitialization() {
 	Material* tesztCian = new Material(vec3(0, 0.7f, 0.7f), vec3(0, 0.4f, 0.4f), vec3(0, 0.4f, 0.4f), 10);
 	Material* tesztSarga = new Material(vec3(0.7f, 0.7f, 0), vec3(0.4f, 0.4f, 0), vec3(0.4f, 0.4f, 0), 50);
 	Material* tesztKek = new Material(vec3(0.1f, 0.1f, 0.4f), vec3(0.1f, 0.1f, 0.5f), vec3(1, 1, 1), 30);
+	Material* haloMaterial = new Material(vec3(0.6f, 0.6f, 0.6f), vec3(0.3f, 0.3f, 0.3f), vec3(0.1f, 0.1f, 0.1f), 90000); ///Felszab
 
 	vec3 torusCenter = vec3(0, 0, -5);
 	Torus* torusGeometry = new Torus(1, 4,torusCenter);
@@ -348,7 +349,7 @@ void onInitialization() {
 
 	///NEW OBJ
 	Cylinder* cylinder = new Cylinder(0.3f, 1);
-	KilottHalo* cylinderTest = new KilottHalo(shaderFennyel, tesztCian, nullptr, cylinder, vec3(-4.4f, 0, -6));
+	KilottHalo* cylinderTest = new KilottHalo(shaderFennyel, haloMaterial, nullptr, cylinder, vec3(-4.4f, 0, -6));
 	scene.setHalo(cylinderTest);
 	scene.AddObject(cylinderTest);
 

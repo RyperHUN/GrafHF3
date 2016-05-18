@@ -172,7 +172,7 @@ public:
 
 class KilottHalo : public Object {
 	const vec3 initDir;
-    const float haloszelesseg = 0.05f;
+    const float haloszelesseg = 0.02f;
 	float haloKezdoMagassag;
 public:
 	KilottHalo(Shader * shader, Material* material, Texture * texture, Geometry* geometry, vec3 position)
@@ -185,6 +185,7 @@ public:
 	
 	void addNewHalo(vec3 from, vec3 to)
 	{
+		from = from - vec3(0, 0.2f, 0);
 		if (geometry != nullptr) //Az osztaly felelos a geometry beállításáért
 			delete geometry;
 		//Bealit jo iranyba
