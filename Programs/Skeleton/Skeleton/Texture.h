@@ -3,6 +3,8 @@
 #include <GL/glew.h>		// must be downloaded 
 #include <GL/freeglut.h>	// must be downloaded unless you have an Apple
 
+#include "ImageFile.h"
+
 struct Texture {
 	unsigned int textureId;
 	Texture() {
@@ -26,5 +28,30 @@ struct Texture {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		
+		//glDisable(GL_TEXTURE_2d); // Ez meg mindig nem jo
+	}
+};
+
+struct TexturePic : public Texture {
+	TexturePic(const char* filename,bool transparent)
+	{
+		glEnable(GL_TEXTURE_2D);
+		glGenTextures(1, &textureId);
+
+		glBindTexture(GL_TEXTURE_2D, textureId);
+		
+		int width, height;
+		ImageFile image(filename, width, height);
+		if (transparent) {
+			gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, width, height,
+				GL_RGBA, GL_UNSIGNED_BYTE, image.LoadWithAlpha(15));
+		}
+		else
+		{
+			gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, width, height,
+				GL_RGB, GL_UNSIGNED_BYTE, image.Load());
+		}
+		glDisable(GL_TEXTURE_2D);
 	}
 };
