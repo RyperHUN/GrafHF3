@@ -361,7 +361,7 @@ void onInitialization() {
 	//scene.AddObject(kisgombHalohoz);
 
 	Cylinder* cylinder = new Cylinder(0.3f, 1);
-	KilottHalo* cylinderTest = new KilottHalo(shaderFennyel, haloMaterial, nullptr, cylinder, vec3(-4.8, 0,-5000),pos);
+	KilottHalo* cylinderTest = new KilottHalo(shaderFennyel, haloMaterial, nullptr, cylinder, vec3(-4.8, 0,-5000));
 	scene.setHalo(cylinderTest);
 	scene.AddObject(cylinderTest);
 
