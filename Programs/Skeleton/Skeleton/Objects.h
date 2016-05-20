@@ -185,7 +185,7 @@ public:
 	
 	void addNewHalo(vec3 from, vec3 to)
 	{
-		from = from - vec3(0, 0.2f, 0);
+		from = from - vec3(0.1f, 0.4f, 0);
 		if (geometry != nullptr) //Az osztaly felelos a geometry beállításáért
 			delete geometry;
 		//Bealit jo iranyba

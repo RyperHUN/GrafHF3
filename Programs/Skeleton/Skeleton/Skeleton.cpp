@@ -302,6 +302,11 @@ void onInitialization() {
 	vec3 cianFenySebesseg(0.3f, 0.3f, -0.4f);
 	vec3 sargaFenySebesseg(-0.3f, 0.2f, -0.05f);
 
+	Texture* testTexture = new Texture(); ///Felszab
+
+	ShaderTextureLoaded* shaderTextureLoaded = new ShaderTextureLoaded(); ///Felszabaditani
+	shaderTextureLoaded->createShader();
+
 	ShaderTextureTorus* shaderTexture = new ShaderTextureTorus();
 	shaderTexture->createShader();
 
@@ -328,7 +333,7 @@ void onInitialization() {
 	Sphere* sphereKicsiGeometry = new Sphere(vec3(0, 0, 0), 0.05f, 10, 10);
 	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.4f);
 	//ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztKek,nullptr,sphereGeometry, vec3(0,1,0),vec3(-4,0,-5.3f));
-	ForgoGomb* guruloGomb = new ForgoGomb(shaderPhongTexture, tesztKek, nullptr, sphereGeometry, vec3(0, 1, 0), torusCenter,torusGeometry);
+	ForgoGomb* guruloGomb = new ForgoGomb(shaderTextureLoaded, tesztKek, testTexture, sphereGeometry, vec3(0, 1, 0), torusCenter,torusGeometry);
 	PattogoGomb* pattogoGombCian = new PattogoGomb(shaderFennyel, tesztCian, nullptr, sphereKicsiGeometry, vec3(0, 1, 0), vec3(-4, 0, -5.2f), torusGeometry, cianFenySebesseg);
 	PattogoGomb* pattogoGombSarga = new PattogoGomb(shaderFennyel, tesztSarga, nullptr, sphereKicsiGeometry, vec3(0, 1, 0), vec3(-3.7f, 0, -4.0f), torusGeometry, sargaFenySebesseg);
 
