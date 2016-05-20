@@ -303,7 +303,7 @@ void onInitialization() {
 	vec3 sargaFenySebesseg(-0.3f, 0.2f, -0.05f);
 
 	Texture* testTexture = new Texture(); ///Felszab MEG NEM MUKODIK
-	Texture* kepTexture = new TexturePic("skull1.bmp", false);
+	Texture* kepTexture = new TexturePic("skull4.bmp", true);
 
 	ShaderTextureLoaded* shaderTextureLoaded = new ShaderTextureLoaded(); ///Felszabaditani
 	shaderTextureLoaded->createShader();
@@ -328,11 +328,11 @@ void onInitialization() {
 	Material* haloMaterial = new Material(vec3(0.6f, 0.6f, 0.6f), vec3(0.3f, 0.3f, 0.3f), vec3(0.1f, 0.1f, 0.1f), 90000); ///Felszab
 
 	vec3 torusCenter = vec3(0, 0, -5);
-	Torus* torusGeometry = new Torus(1, 4,torusCenter);
+	Torus* torusGeometry = new Torus(1.5f, 3.7f,torusCenter);
 	ForgoObjektum* torus = new ForgoObjektum(shaderPhongTexture, tesztPiros, nullptr, torusGeometry, vec3(1, 0, 0), torusCenter);
 
 	Sphere* sphereKicsiGeometry = new Sphere(vec3(0, 0, 0), 0.05f, 10, 10);
-	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.4f);
+	Sphere* sphereGeometry = new Sphere(vec3(0, 0, 0), 0.7f);
 	//ForgoObjektum* guruloKor = new ForgoObjektum(shaderFennyel, tesztKek,nullptr,sphereGeometry, vec3(0,1,0),vec3(-4,0,-5.3f));
 	ForgoGomb* guruloGomb = new ForgoGomb(shaderTextureLoaded, tesztKek, kepTexture, sphereGeometry, vec3(0, 1, 0), torusCenter,torusGeometry);
 	PattogoGomb* pattogoGombCian = new PattogoGomb(shaderFennyel, tesztCian, nullptr, sphereKicsiGeometry, vec3(0, 1, 0), vec3(-4, 0, -5.2f), torusGeometry, cianFenySebesseg);
@@ -355,7 +355,7 @@ void onInitialization() {
 
 	///NEW OBJ
 	Cylinder* cylinder = new Cylinder(0.3f, 1);
-	KilottHalo* cylinderTest = new KilottHalo(shaderFennyel, haloMaterial, nullptr, cylinder, vec3(0, 0, 0));
+	KilottHalo* cylinderTest = new KilottHalo(shaderFennyel, haloMaterial, nullptr, cylinder, vec3(0, 0, 200));
 	scene.setHalo(cylinderTest);
 	scene.AddObject(cylinderTest);
 
