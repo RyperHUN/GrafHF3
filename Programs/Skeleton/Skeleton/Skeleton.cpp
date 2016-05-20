@@ -354,8 +354,14 @@ void onInitialization() {
 	scene.AddObject(pattogoGombCian);
 
 	///NEW OBJ
+	//Circle* circleGeometry = new Circle(0.5f, false);
+	//Sphere* haloGomb = new Sphere(vec3(0, 0, 0), 0.02f, 10, 10);
+	//ForgoObjektum* kisgombHalohoz = new ForgoObjektum(shaderFennyel, haloMaterial, nullptr, haloGomb, vec3(1, 0, 0), vec3(-4.5f,0,-5500));
+	//vec3* pos = kisgombHalohoz->getPos();
+	//scene.AddObject(kisgombHalohoz);
+
 	Cylinder* cylinder = new Cylinder(0.3f, 1);
-	KilottHalo* cylinderTest = new KilottHalo(shaderFennyel, haloMaterial, nullptr, cylinder, vec3(0, 0, 200));
+	KilottHalo* cylinderTest = new KilottHalo(shaderFennyel, haloMaterial, nullptr, cylinder, vec3(-4.8, 0,-5000),pos);
 	scene.setHalo(cylinderTest);
 	scene.AddObject(cylinderTest);
 

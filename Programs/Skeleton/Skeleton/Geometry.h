@@ -193,13 +193,45 @@ public:
 		return normal;
 	}
 };
+
+class Circle : public ParamSurface {
+	float r;
+	bool invertNormal = false;
+public:
+	Circle(float r, bool invertNormal)
+		:r(r), invertNormal(invertNormal)
+	{
+		Create(10, 10);
+	}
+	///Tesszellacio nem jó
+	VertexData GenVertexData(float u, float v)
+	{
+		VertexData vd;
+
+		float x = r* cos(v*M_PI);
+		float y = r* cos(v*M_PI);
+		float z = 0;
+
+		vec3 normal(0, 0, -1);
+		if (invertNormal)
+			normal = normal * -1.0f;
+		vd.u = u; vd.v = v;
+		vd.normal = normal;
+
+		vd.position = vec3(x, y, z);
+
+		return vd;
+	}
+};
+
 //Cylinder - Henger
 class Cylinder : public ParamSurface{
 	float R;
 	float magassag;
+	Circle geometryCircle;
 public:
 	Cylinder(float R, float magassag)
-		: R(R),magassag(magassag)
+		: R(R),magassag(magassag), geometryCircle(R, false)
 	{
 		Create(22, 15); // tessellation level
 	}
@@ -233,3 +265,4 @@ public:
 		return vd;
 	}
 };
+
