@@ -192,8 +192,8 @@ public:
 		vec3 toDestination = to - from;
 		vec3 normToDestination = toDestination.normalize();
 
-		rotAxis = cross(normToDestination, initDir);
-		rotAngle = -1* acosf(dot(normToDestination, initDir));
+		rotAxis = cross(normToDestination, initDir).normalize();
+		rotAngle = -1*acosf(dot(normToDestination, initDir));
 		//Kesz beallitva
 		float tavolsag = toDestination.Length();
 
